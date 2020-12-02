@@ -9,15 +9,14 @@ using UnityEngine;
 public class RayTracingInOneWeekend : MonoBehaviour
 {
     [SerializeField]
-    double aspectRatio = 16d / 9d;
+    float aspectRatio = 16f / 9f;
 
     [SerializeField]
     int textureWidth = 160;
 
     //int textureHeight = textureWidth / aspectRatio;
 
-    [SerializeField]
-    double viewportHeight = 2d;
+
 
 
 
@@ -33,41 +32,43 @@ public class RayTracingInOneWeekend : MonoBehaviour
 
 
 
-    struct Vec3
+    
+
+    Color RayColor(Ray ray)
     {
-        public Vec3(Vector3 vector)
+        Vector3 sphereCenter = new Vector3(0f, 0f, -1f);
+        float t = HitSphere(sphereCenter, 0.5f, ray);
+        if (t > 0f)
         {
-            this.x = vector.x;
-            this.y = vector.x;
-            this.z = vector.x;
+            Vector3 normal = (ray.At(t) - sphereCenter).normalized;
+            return new Color(normal.x + 1f, normal.y + 1f, normal.z + 1f) * 0.5f;
         }
 
-        public Vec3(double x, double y, double z)
-        {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-        }
+        // background
+        var unitDirection = ray.direction.normalized;
+        float offset = (unitDirection.y + 1f) * 0.5f;
 
-        public double x;
-        public double y;
-        public double z;
+        return (1f - offset) * Color.white + offset * new Color(0.5f, 0.7f, 1f);
     }
 
 
-    class Ray
+    float HitSphere(Vector3 center, float radius, Ray ray)
     {
-        public Ray(Vector3 origin, Vector3 direction)
+        Vector3 oc = ray.origin - center;
+        float a = ray.direction.sqrMagnitude;
+        float half_b = Vector3.Dot(oc, ray.direction);
+        float c = oc.sqrMagnitude - radius * radius;
+        float discriminant = half_b * half_b - a * c;
+
+        if (discriminant >= 0f)
         {
-            this.origin = new Vec3(origin);
-            this.direction = new Vec3(direction);
+            return (-half_b - Mathf.Sqrt(discriminant)) / a;
         }
-
-
-        public Vec3 origin;
-        public Vec3 direction;
+        else
+        {
+            return -1f;
+        }
     }
-
 
 
 
@@ -75,19 +76,19 @@ public class RayTracingInOneWeekend : MonoBehaviour
     {
         // image
         int textureHeight = (int)(textureWidth / aspectRatio);
-
-        double viewportWidth = aspectRatio * viewportHeight;
-
-        double focalLength = 1d;
-
-        Vec3 original = new Vec3(0d, 0d, 0d);
-        Vec3 horizontal = new Vec3(viewportWidth, 0d, 0d);
-
-
-
         texResult = new Texture2D(textureWidth, textureHeight);
 
+
         // camera
+        float viewportHeight = 2f;
+        float viewportWidth = aspectRatio * viewportHeight;
+
+        float focalLength = 1f;
+
+        Vector3 origin = Vector3.zero;
+        Vector3 horizontal = new Vector3(viewportWidth, 0f, 0f);
+        Vector3 vertical = new Vector3(0f, viewportHeight, 0f);
+        Vector3 lowerLeftCorner = origin - (horizontal / 2f) - (vertical / 2f) - new Vector3(0f, 0f, focalLength);
 
 
 
@@ -96,11 +97,13 @@ public class RayTracingInOneWeekend : MonoBehaviour
         {
             for (int x = 0; x < textureWidth; x++)
             {
-                float r = (float)x / (textureWidth - 1);
-                float g = (float)y / (textureHeight - 1);
-                float b = 0.25f;
+                float u = (float)x / (textureWidth - 1);
+                float v = (float)y / (textureHeight - 1);
 
-                texResult.SetPixel(x, y, new Color(r, g, b, 1f));
+                var ray = new Ray(origin, (lowerLeftCorner + horizontal * u + vertical * v) - origin);
+                var bgColor = RayColor(ray);
+
+                texResult.SetPixel(x, y, bgColor);
             }
         }
 
