@@ -32,15 +32,14 @@ public class RayTracingInOneWeekend : MonoBehaviour
 
 
 
-    
 
-    Color RayColor(Ray ray)
+
+    Color RayColor(Ray ray, Hittable world)
     {
-        Vector3 sphereCenter = new Vector3(0f, 0f, -1f);
-        float t = HitSphere(sphereCenter, 0.5f, ray);
-        if (t > 0f)
+        HitRecord hitRecord = null;
+        if (world.IsHit(ray, 0f, float.MaxValue, ref hitRecord))
         {
-            Vector3 normal = (ray.At(t) - sphereCenter).normalized;
+            var normal = hitRecord.normal;
             return new Color(normal.x + 1f, normal.y + 1f, normal.z + 1f) * 0.5f;
         }
 
@@ -78,6 +77,10 @@ public class RayTracingInOneWeekend : MonoBehaviour
         int textureHeight = (int)(textureWidth / aspectRatio);
         texResult = new Texture2D(textureWidth, textureHeight);
 
+        // world
+        HittaleList world = new HittaleList(); ;
+        world.Add(new Sphere(new Vector3(0f, 0f, -1f), 0.5f));
+        world.Add(new Sphere(new Vector3(0f, -100.5f, -1f), 100f));
 
         // camera
         float viewportHeight = 2f;
@@ -101,9 +104,9 @@ public class RayTracingInOneWeekend : MonoBehaviour
                 float v = (float)y / (textureHeight - 1);
 
                 var ray = new Ray(origin, (lowerLeftCorner + horizontal * u + vertical * v) - origin);
-                var bgColor = RayColor(ray);
+                var color = RayColor(ray, world);
 
-                texResult.SetPixel(x, y, bgColor);
+                texResult.SetPixel(x, y, color);
             }
         }
 

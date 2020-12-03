@@ -17,13 +17,12 @@ public class Sphere : Hittable
     }
 
 
-    public override bool IsHit(Ray ray, float t_min, float t_max, HitRecord hitRecord)
+    public override bool IsHit(Ray ray, float t_min, float t_max, ref HitRecord hitRecord)
     {
         Vector3 oc = ray.origin - center;
         float a = ray.direction.sqrMagnitude;
         float half_b = Vector3.Dot(oc, ray.direction);
         float c = oc.sqrMagnitude - radius * radius;
-
         float discriminant = half_b * half_b - a * c;
 
         if (discriminant < 0)
@@ -46,7 +45,8 @@ public class Sphere : Hittable
 
         hitRecord.t = root;
         hitRecord.p = ray.At(hitRecord.t);
-        hitRecord.normal = (hitRecord.p - center) / radius;
+        Vector3 outwardNormal = (hitRecord.p - center) / radius;
+        hitRecord.SetFaceNormal(ray, outwardNormal);
 
         return true;
     }
