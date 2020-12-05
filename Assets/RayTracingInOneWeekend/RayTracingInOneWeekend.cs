@@ -18,8 +18,10 @@ public class RayTracingInOneWeekend : MonoBehaviour
     Vector2Int textureWidthHeight = new Vector2Int(320, 180);
 
     [SerializeField]
-    int samplesPerPixel = 10;
+    int samplesPerPixel = 8;
 
+    [SerializeField]
+    int maxDepth = 8;
 
 
 
@@ -32,7 +34,29 @@ public class RayTracingInOneWeekend : MonoBehaviour
 
 
 
-    Color RayColor(Ray ray, Hittable world)
+    Color RayColor(Ray ray, Hittable world, int depth)
+    {
+        // If we've exceeded the ray bounce limit, no more light is gathered
+        if (depth <= 0)
+        {
+            return Color.black;
+        }
+
+        HitRecord hitRecord = null;
+        // t_min=0.0001f to fix shadow acne
+        if (world.IsHit(ray, 0.0001f, float.MaxValue, ref hitRecord))
+        {
+            Vector3 target = hitRecord.p + hitRecord.normal + Random.insideUnitSphere;
+            return RayColor(new Ray(hitRecord.p, target - hitRecord.p), world, depth - 1) * 0.5f;
+        }
+
+        // background
+        var unitDirection = ray.direction.normalized;
+        float offset = (unitDirection.y + 1f) * 0.5f;
+        return (1f - offset) * Color.white + offset * new Color(0.5f, 0.7f, 1f);
+    }
+
+    Color RayColor2(Ray ray, Hittable world)
     {
         HitRecord hitRecord = null;
 
@@ -50,6 +74,8 @@ public class RayTracingInOneWeekend : MonoBehaviour
 
 
 
+
+
     float GetRandomNum()
     {
         return Random.Range(0f, 0.999999f);
@@ -61,6 +87,13 @@ public class RayTracingInOneWeekend : MonoBehaviour
         // Divide the color by the number of samples.
         float scale = 1f / (float)samplesPerPixel;
         pixelColor *= scale;
+        /*
+        // gamma-correct for gamma=2.0
+        pixelColor = new Color(
+            Mathf.Sqrt(scale * pixelColor.r), 
+            Mathf.Sqrt(scale * pixelColor.g), 
+            Mathf.Sqrt(scale * pixelColor.b));
+        */
 
 
         // Write the translated [0,1] value of each color component.
@@ -74,7 +107,7 @@ public class RayTracingInOneWeekend : MonoBehaviour
         // image
         int textureWidth = textureWidthHeight.x;
         int textureHeight = textureWidthHeight.y;
-        texResult = new Texture2D(textureWidth, textureHeight);
+        texResult = new Texture2D(textureWidth, textureHeight, TextureFormat.RGBA32, false, true);
 
         // world
         HittaleList world = new HittaleList(); ;
@@ -98,7 +131,7 @@ public class RayTracingInOneWeekend : MonoBehaviour
                     float v = ((float)y + GetRandomNum()) / (textureHeight - 1);
 
                     var ray = cam.GetRay(u, v);
-                    pixelColor += RayColor(ray, world);
+                    pixelColor += RayColor(ray, world, maxDepth);
                 }
                 WriteColor(texResult, x, y, pixelColor, samplesPerPixel);
             }
@@ -109,7 +142,7 @@ public class RayTracingInOneWeekend : MonoBehaviour
     }
 
 
-    
+
 
 
 }

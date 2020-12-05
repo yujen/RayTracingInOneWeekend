@@ -312,6 +312,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   textureWidthHeight: {x: 640, y: 360}
   samplesPerPixel: 8
+  maxDepth: 8
   texResult: {fileID: 0}
 --- !u!114 &1651417737
 MonoBehaviour:
