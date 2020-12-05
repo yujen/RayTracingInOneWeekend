@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Unity.Collections;
 using UnityEngine;
 
 
@@ -8,20 +9,22 @@ using UnityEngine;
 
 public class RayTracingInOneWeekend : MonoBehaviour
 {
-    [SerializeField]
-    float aspectRatio = 16f / 9f;
+    //[SerializeField]
+    //int textureWidth = 160;
+    //[SerializeField]
+    //int textureHeight = 90;
 
     [SerializeField]
-    int textureWidth = 160;
-
-    //int textureHeight = textureWidth / aspectRatio;
-
-
-
-
-
+    Vector2Int textureWidthHeight = new Vector2Int(320, 180);
 
     [SerializeField]
+    int samplesPerPixel = 10;
+
+
+
+
+
+    [SerializeField, ReadOnly]
     private Texture2D texResult;
 
 
@@ -30,43 +33,69 @@ public class RayTracingInOneWeekend : MonoBehaviour
 
 
 
+    class ColorDouble
+    {
+        public double r;
+        public double g;
+        public double b;
+
+        public ColorDouble(double r, double g, double b)
+        {
+            this.r = r;
+            this.g = g;
+            this.b = b;
+        }
+
+        public Color ToColor()
+        {
+            return new Color((float)r, (float)g, (float)b);
+        }
+    }
 
 
 
-
-    Color RayColor(Ray ray, Hittable world)
+    ColorDouble RayColor(Ray ray, Hittable world)
     {
         HitRecord hitRecord = null;
+
         if (world.IsHit(ray, 0f, float.MaxValue, ref hitRecord))
         {
             var normal = hitRecord.normal;
-            return new Color(normal.x + 1f, normal.y + 1f, normal.z + 1f) * 0.5f;
+            return new ColorDouble((normal.x + 1d) * 0.5d, (normal.y + 1d) * 0.5d, (normal.z + 1d) * 0.5d);
         }
 
         // background
         var unitDirection = ray.direction.normalized;
         float offset = (unitDirection.y + 1f) * 0.5f;
+        var color = (1f - offset) * Color.white + offset * new Color(0.5f, 0.7f, 1f);
 
-        return (1f - offset) * Color.white + offset * new Color(0.5f, 0.7f, 1f);
+        return new ColorDouble(color.r, color.g, color.b);
     }
 
 
-    float HitSphere(Vector3 center, float radius, Ray ray)
-    {
-        Vector3 oc = ray.origin - center;
-        float a = ray.direction.sqrMagnitude;
-        float half_b = Vector3.Dot(oc, ray.direction);
-        float c = oc.sqrMagnitude - radius * radius;
-        float discriminant = half_b * half_b - a * c;
 
-        if (discriminant >= 0f)
-        {
-            return (-half_b - Mathf.Sqrt(discriminant)) / a;
-        }
-        else
-        {
-            return -1f;
-        }
+    float GetRandomNum()
+    {
+        return 0f;
+        return Random.Range(0f, 0.99999f);
+    }
+
+
+    void WriteColor(Texture2D tex, int x, int y, ColorDouble pixelColor, int samplesPerPixel)
+    {
+        double r = pixelColor.r;
+        double g = pixelColor.g;
+        double b = pixelColor.b;
+
+        // Divide the color by the number of samples.
+        double scale = 1d / (double)samplesPerPixel;
+        r *= scale;
+        g *= scale;
+        b *= scale;
+
+
+        // Write the translated [0,1] value of each color component.
+        tex.SetPixel(x, y, new Color((float)r, (float)g, (float)b));
     }
 
 
@@ -74,7 +103,8 @@ public class RayTracingInOneWeekend : MonoBehaviour
     void Start()
     {
         // image
-        int textureHeight = (int)(textureWidth / aspectRatio);
+        int textureWidth = textureWidthHeight.x;
+        int textureHeight = textureWidthHeight.y;
         texResult = new Texture2D(textureWidth, textureHeight);
 
         // world
@@ -83,16 +113,7 @@ public class RayTracingInOneWeekend : MonoBehaviour
         world.Add(new Sphere(new Vector3(0f, -100.5f, -1f), 100f));
 
         // camera
-        float viewportHeight = 2f;
-        float viewportWidth = aspectRatio * viewportHeight;
-
-        float focalLength = 1f;
-
-        Vector3 origin = Vector3.zero;
-        Vector3 horizontal = new Vector3(viewportWidth, 0f, 0f);
-        Vector3 vertical = new Vector3(0f, viewportHeight, 0f);
-        Vector3 lowerLeftCorner = origin - (horizontal / 2f) - (vertical / 2f) - new Vector3(0f, 0f, focalLength);
-
+        var cam = new RayCamera(textureWidth, textureHeight);
 
 
         // render
@@ -100,20 +121,29 @@ public class RayTracingInOneWeekend : MonoBehaviour
         {
             for (int x = 0; x < textureWidth; x++)
             {
-                float u = (float)x / (textureWidth - 1);
-                float v = (float)y / (textureHeight - 1);
+                float u = ((float)x + GetRandomNum()) / (textureWidth - 1);
+                float v = ((float)y + GetRandomNum()) / (textureHeight - 1);
+                ColorDouble pixelColor = new ColorDouble(0d, 0d, 0d);
 
-                var ray = new Ray(origin, (lowerLeftCorner + horizontal * u + vertical * v) - origin);
-                var color = RayColor(ray, world);
+                for (int i = 0; i < samplesPerPixel; i++)
+                {
+                    var ray = cam.GetRay(u, v);
 
-                texResult.SetPixel(x, y, color);
+                    ColorDouble c = RayColor(ray, world);
+                    pixelColor.r += c.r;
+                    pixelColor.g += c.g;
+                    pixelColor.b += c.b;
+                }
+                WriteColor(texResult, x, y, pixelColor, samplesPerPixel);
             }
         }
 
         texResult.Apply();
+
     }
 
 
+    
 
 
 }

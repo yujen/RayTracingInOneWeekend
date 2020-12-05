@@ -310,8 +310,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 234fec3ea45640242b041f24b34804b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  aspectRatio: 1.7777778
-  textureWidth: 320
+  textureWidthHeight: {x: 160, y: 90}
+  samplesPerPixel: 100
   texResult: {fileID: 0}
 --- !u!114 &1651417737
 MonoBehaviour:
