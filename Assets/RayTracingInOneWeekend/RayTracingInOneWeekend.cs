@@ -32,70 +32,39 @@ public class RayTracingInOneWeekend : MonoBehaviour
 
 
 
-
-    class ColorDouble
-    {
-        public double r;
-        public double g;
-        public double b;
-
-        public ColorDouble(double r, double g, double b)
-        {
-            this.r = r;
-            this.g = g;
-            this.b = b;
-        }
-
-        public Color ToColor()
-        {
-            return new Color((float)r, (float)g, (float)b);
-        }
-    }
-
-
-
-    ColorDouble RayColor(Ray ray, Hittable world)
+    Color RayColor(Ray ray, Hittable world)
     {
         HitRecord hitRecord = null;
 
         if (world.IsHit(ray, 0f, float.MaxValue, ref hitRecord))
         {
             var normal = hitRecord.normal;
-            return new ColorDouble((normal.x + 1d) * 0.5d, (normal.y + 1d) * 0.5d, (normal.z + 1d) * 0.5d);
+            return new Color((normal.x + 1f), (normal.y + 1f), (normal.z + 1f)) * 0.5f;
         }
 
         // background
         var unitDirection = ray.direction.normalized;
         float offset = (unitDirection.y + 1f) * 0.5f;
-        var color = (1f - offset) * Color.white + offset * new Color(0.5f, 0.7f, 1f);
-
-        return new ColorDouble(color.r, color.g, color.b);
+        return (1f - offset) * Color.white + offset * new Color(0.5f, 0.7f, 1f);
     }
 
 
 
     float GetRandomNum()
     {
-        return 0f;
-        return Random.Range(0f, 0.99999f);
+        return Random.Range(0f, 0.999999f);
     }
 
 
-    void WriteColor(Texture2D tex, int x, int y, ColorDouble pixelColor, int samplesPerPixel)
+    void WriteColor(Texture2D tex, int x, int y, Color pixelColor, int samplesPerPixel)
     {
-        double r = pixelColor.r;
-        double g = pixelColor.g;
-        double b = pixelColor.b;
-
         // Divide the color by the number of samples.
-        double scale = 1d / (double)samplesPerPixel;
-        r *= scale;
-        g *= scale;
-        b *= scale;
+        float scale = 1f / (float)samplesPerPixel;
+        pixelColor *= scale;
 
 
         // Write the translated [0,1] value of each color component.
-        tex.SetPixel(x, y, new Color((float)r, (float)g, (float)b));
+        tex.SetPixel(x, y, pixelColor);
     }
 
 
@@ -121,18 +90,15 @@ public class RayTracingInOneWeekend : MonoBehaviour
         {
             for (int x = 0; x < textureWidth; x++)
             {
-                float u = ((float)x + GetRandomNum()) / (textureWidth - 1);
-                float v = ((float)y + GetRandomNum()) / (textureHeight - 1);
-                ColorDouble pixelColor = new ColorDouble(0d, 0d, 0d);
+                Color pixelColor = Color.black;
 
                 for (int i = 0; i < samplesPerPixel; i++)
                 {
-                    var ray = cam.GetRay(u, v);
+                    float u = ((float)x + GetRandomNum()) / (textureWidth - 1);
+                    float v = ((float)y + GetRandomNum()) / (textureHeight - 1);
 
-                    ColorDouble c = RayColor(ray, world);
-                    pixelColor.r += c.r;
-                    pixelColor.g += c.g;
-                    pixelColor.b += c.b;
+                    var ray = cam.GetRay(u, v);
+                    pixelColor += RayColor(ray, world);
                 }
                 WriteColor(texResult, x, y, pixelColor, samplesPerPixel);
             }
