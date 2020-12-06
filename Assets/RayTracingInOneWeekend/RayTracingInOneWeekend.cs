@@ -57,8 +57,8 @@ public class RayTracingInOneWeekend : MonoBehaviour
         // t_min=0.0001f to fix shadow acne
         if (world.IsHit(ray, 0.0001f, float.MaxValue, ref hitRecord))
         {
-            Ray scattered;
             Color attenuation;
+            Ray scattered;
             if (hitRecord.objMaterial.Scatter(ray, hitRecord, out attenuation, out scattered))
             {
                 return attenuation * RayColor(scattered, world, depth - 1);
@@ -94,7 +94,9 @@ public class RayTracingInOneWeekend : MonoBehaviour
 
 
 
-
+    /// <summary>
+    /// Returns a random real in [0,1).
+    /// </summary>
     float GetRandomNum()
     {
         return Random.Range(0f, 0.999999f);
@@ -131,14 +133,16 @@ public class RayTracingInOneWeekend : MonoBehaviour
 
         // world
         var matGround = new LambertainMaterial(new Color(0.8f, 0.8f, 0f));
-        var matCenter = new DielectricMaterial(1.5f);
-        var matLeft = new MetalMaterial(new Color(0.8f, 0.8f, 0.8f));
+        var matCenter = new LambertainMaterial(new Color(0.8f, 0.8f, 0f));
+        //var matLeft = new MetalMaterial(new Color(0.8f, 0.8f, 0.8f));
+        var matLeft = new DielectricMaterial(1.5f);
         var matRight = new FuzzyMetalMaterial(new Color(0.8f, 0.6f, 0.2f), 0.7f);
 
         HittableList world = new HittableList();
         world.Add(new Sphere(new Vector3(0f, -100.5f, -1f), 100f, matGround));
         world.Add(new Sphere(new Vector3(0f, 0f, -1f), 0.5f, matCenter));
         world.Add(new Sphere(new Vector3(-1f, 0f, -1f), 0.5f, matLeft));
+        world.Add(new Sphere(new Vector3(-1f, 0f, -1f), -0.4f, matLeft));
         world.Add(new Sphere(new Vector3(1f, 0f, -1f), 0.5f, matRight));
 
 
