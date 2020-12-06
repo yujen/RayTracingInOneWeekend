@@ -5,6 +5,12 @@ using UnityEngine;
 
 
 
+public abstract class Hittable
+{
+    abstract public bool IsHit(Ray ray, float t_min, float t_max, ref HitRecord hitRecord);
+
+}
+
 
 public class Ray
 {
@@ -24,6 +30,9 @@ public class Ray
 
 
     public Vector3 origin;
+    /// <summary>
+    /// ray方向, 不一定是單位向量
+    /// </summary>
     public Vector3 direction;
 }
 
@@ -32,6 +41,10 @@ public class HitRecord
     public Vector3 p;
     public Vector3 normal;
     public float t;
+    public ObjectMaterial objMaterial;
+
+
+
     bool frontFace;
 
 
@@ -40,12 +53,6 @@ public class HitRecord
         frontFace = Vector3.Dot(ray.direction, outwardNormal) < 0f;
         normal = frontFace ? outwardNormal : -outwardNormal;
     }
-
-}
-
-public abstract class Hittable
-{
-    abstract public bool IsHit(Ray ray, float t_min, float t_max, ref HitRecord hitRecord);
 
 }
 

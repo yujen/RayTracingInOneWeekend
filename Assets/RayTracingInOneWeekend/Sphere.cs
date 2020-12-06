@@ -8,12 +8,14 @@ public class Sphere : Hittable
 {
     public Vector3 center;
     public float radius;
+    public ObjectMaterial objMaterial;
 
 
-    public Sphere(Vector3 center, float radius)
+    public Sphere(Vector3 center, float radius, ObjectMaterial objMaterial)
     {
         this.center = center;
         this.radius = radius;
+        this.objMaterial = objMaterial;
     }
 
 
@@ -47,6 +49,7 @@ public class Sphere : Hittable
         hitRecord.p = ray.At(hitRecord.t);
         Vector3 outwardNormal = (hitRecord.p - center) / radius;
         hitRecord.SetFaceNormal(ray, outwardNormal);
+        hitRecord.objMaterial = objMaterial;
 
         return true;
     }

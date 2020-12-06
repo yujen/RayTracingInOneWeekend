@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public class HittaleList : Hittable
+public class HittableList : Hittable
 {
     private List<Hittable> listHittable = new List<Hittable>();
 

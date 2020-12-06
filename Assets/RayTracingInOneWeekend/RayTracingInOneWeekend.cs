@@ -32,7 +32,18 @@ public class RayTracingInOneWeekend : MonoBehaviour
 
 
 
-
+    Vector3 RandomInsideUnitHemisphere(Vector3 normal)
+    {
+        var unitSphere = Random.insideUnitSphere;
+        if (Vector3.Dot(unitSphere, normal) > 0f)
+        {
+            return unitSphere;
+        }
+        else
+        {
+            return -unitSphere;
+        }
+    }
 
     Color RayColor(Ray ray, Hittable world, int depth)
     {
@@ -46,8 +57,22 @@ public class RayTracingInOneWeekend : MonoBehaviour
         // t_min=0.0001f to fix shadow acne
         if (world.IsHit(ray, 0.0001f, float.MaxValue, ref hitRecord))
         {
-            Vector3 target = hitRecord.p + hitRecord.normal + Random.insideUnitSphere;
-            return RayColor(new Ray(hitRecord.p, target - hitRecord.p), world, depth - 1) * 0.5f;
+            //Vector3 target = hitRecord.p + hitRecord.normal + Random.onUnitSphere;
+            //Vector3 target = hitRecord.p + hitRecord.normal + Random.insideUnitSphere;
+            //Vector3 target = hitRecord.p + hitRecord.normal + RandomInsideUnitHemisphere(hitRecord.normal);
+            //return RayColor(new Ray(hitRecord.p, target - hitRecord.p), world, depth - 1) * 0.5f;
+            
+            Ray scattered;
+            Color attenuation;
+            if (hitRecord.objMaterial.Scatter(ray, hitRecord, out attenuation, out scattered))
+            {
+                return attenuation * RayColor(scattered, world, depth - 1);
+            }
+            else
+            {
+                return Color.black;
+            }
+
         }
 
         // background
@@ -59,7 +84,6 @@ public class RayTracingInOneWeekend : MonoBehaviour
     Color RayColor2(Ray ray, Hittable world)
     {
         HitRecord hitRecord = null;
-
         if (world.IsHit(ray, 0f, float.MaxValue, ref hitRecord))
         {
             var normal = hitRecord.normal;
@@ -87,6 +111,7 @@ public class RayTracingInOneWeekend : MonoBehaviour
         // Divide the color by the number of samples.
         float scale = 1f / (float)samplesPerPixel;
         pixelColor *= scale;
+
         /*
         // gamma-correct for gamma=2.0
         pixelColor = new Color(
@@ -110,9 +135,22 @@ public class RayTracingInOneWeekend : MonoBehaviour
         texResult = new Texture2D(textureWidth, textureHeight, TextureFormat.RGBA32, false, true);
 
         // world
-        HittaleList world = new HittaleList(); ;
+        var matGround = new LambertainMaterial(new Color(0.8f, 0.8f, 0f));
+        var matCenter = new LambertainMaterial(new Color(0.7f, 0.3f, 0.3f));
+        var matLeft = new MetalMaterial(new Color(0.8f, 0.8f, 0.8f));
+        var matRight = new MetalMaterial(new Color(0.8f, 0.6f, 0.2f));
+
+        HittableList world = new HittableList();
+        world.Add(new Sphere(new Vector3(0f, -100.5f, -1f), 100f, matGround));
+        world.Add(new Sphere(new Vector3(0f, 0f, -1f), 0.5f, matCenter));
+        world.Add(new Sphere(new Vector3(-1f, 0f, -1f), 0.5f, matLeft));
+        world.Add(new Sphere(new Vector3(1f, 0f, -1f), 0.5f, matRight));
+
+        /*
+        HittableList world = new HittableList();
         world.Add(new Sphere(new Vector3(0f, 0f, -1f), 0.5f));
         world.Add(new Sphere(new Vector3(0f, -100.5f, -1f), 100f));
+        */
 
         // camera
         var cam = new RayCamera(textureWidth, textureHeight);
