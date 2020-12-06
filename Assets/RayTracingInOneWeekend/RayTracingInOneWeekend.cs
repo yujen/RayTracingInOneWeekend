@@ -133,22 +133,24 @@ public class RayTracingInOneWeekend : MonoBehaviour
 
         // world
         var matGround = new LambertainMaterial(new Color(0.8f, 0.8f, 0f));
-        var matCenter = new LambertainMaterial(new Color(0.8f, 0.8f, 0f));
+        var matCenter = new LambertainMaterial(new Color(0.1f, 0.2f, 0.5f));
         //var matLeft = new MetalMaterial(new Color(0.8f, 0.8f, 0.8f));
         var matLeft = new DielectricMaterial(1.5f);
         var matRight = new FuzzyMetalMaterial(new Color(0.8f, 0.6f, 0.2f), 0.7f);
 
         HittableList world = new HittableList();
-        world.Add(new Sphere(new Vector3(0f, -100.5f, -1f), 100f, matGround));
-        world.Add(new Sphere(new Vector3(0f, 0f, -1f), 0.5f, matCenter));
-        world.Add(new Sphere(new Vector3(-1f, 0f, -1f), 0.5f, matLeft));
-        world.Add(new Sphere(new Vector3(-1f, 0f, -1f), -0.4f, matLeft));
-        world.Add(new Sphere(new Vector3(1f, 0f, -1f), 0.5f, matRight));
+        world.Add(new Sphere(new Vector3(0f, -100.5f, 0f), 100f, matGround));
+        world.Add(new Sphere(new Vector3(0f, 0f, 0f), 0.5f, matCenter));
+        world.Add(new Sphere(new Vector3(-1f, 0f, 0f), 0.5f, matLeft));
+        world.Add(new Sphere(new Vector3(-1f, 0f, 0f), -0.4f, matLeft));
+        world.Add(new Sphere(new Vector3(1f, 0f, 0f), 0.5f, matRight));
 
 
 
         // camera
-        var cam = new RayCamera(textureWidth, textureHeight);
+        var cam = GetComponent<RayCamera>();
+        cam = cam ? cam : new RayCamera();
+        cam.Setup((float)textureWidth / (float)textureHeight);
 
 
         // render

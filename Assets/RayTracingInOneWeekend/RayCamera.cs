@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using Unity.Collections;
 using UnityEngine;
@@ -7,47 +8,64 @@ using UnityEngine;
 
 
 
-public class RayCamera
+public class RayCamera : MonoBehaviour
 {
+    
+
+    /// <summary>
+    /// vertical field-of-view in degrees
+    /// </summary>
     [SerializeField]
-    float viewportHeight = 2f;
+    public float verticalFov = 70f;
 
     [SerializeField]
-    float focalLength = 1f;
+    public float focalLength = 1f;
 
     [SerializeField]
-    Vector3 origin = Vector3.zero;
+    public Vector3 lookFrom = new Vector3(-2f, 2f, 1f);
+    [SerializeField]
+    public Vector3 lookAt = Vector3.zero;
+    [SerializeField]
+    public Vector3 vup = Vector3.up;
 
 
-    [ReadOnly]
-    float viewportWidth;
+    [NonSerialized]
+    public float viewportHeight;
+    [NonSerialized]
+    public float viewportWidth;
+    [NonSerialized]
+    public Vector3 horizontal;
+    [NonSerialized]
+    public Vector3 vertical;
+    [NonSerialized]
+    public Vector3 lowerLeftCorner;
 
-    [ReadOnly]
-    Vector3 horizontal;
-    [ReadOnly]
-    Vector3 vertical;
-    [ReadOnly]
-    Vector3 lowerLeftCorner;
 
 
-
-    public RayCamera(int textureWidth, int textureHeight)
+    public void Setup(float aspectRatio)
     {
-        float aspectRatio = (float)textureWidth / (float)textureHeight;
-        this.viewportWidth = aspectRatio * viewportHeight;
+        float theta = verticalFov * Mathf.Deg2Rad;
+        float h = Mathf.Tan(theta / 2f);
+        viewportHeight = 2f * h;
+        viewportWidth = aspectRatio * viewportHeight;
 
 
-        this.horizontal = new Vector3(viewportWidth, 0f, 0f);
-        this.vertical = new Vector3(0f, viewportHeight, 0f);
+        Vector3 w = (lookFrom - lookAt).normalized;
+        Vector3 u = Vector3.Cross(vup, w).normalized;
+        Vector3 v = Vector3.Cross(w, u);
 
-        lowerLeftCorner = origin - (horizontal / 2f) - (vertical / 2f) - new Vector3(0f, 0f, focalLength);
+
+        horizontal = viewportWidth * u;
+        vertical = viewportHeight * v;
+
+        lowerLeftCorner = lookFrom - (horizontal / 2f) - (vertical / 2f) - w;
     }
 
 
 
-    public Ray GetRay(float u, float v)
+    public Ray GetRay(float s, float t)
     {
-        return new Ray(origin, lowerLeftCorner + u * horizontal + v * vertical - origin);
+        return new Ray(lookFrom, lowerLeftCorner + s * horizontal + t * vertical - lookFrom);
     }
 
 
