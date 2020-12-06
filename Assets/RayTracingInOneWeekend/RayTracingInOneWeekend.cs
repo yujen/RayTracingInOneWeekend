@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using Unity.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 
 
 
@@ -17,16 +14,16 @@ public class RayTracingInOneWeekend : MonoBehaviour
     [SerializeField]
     Vector2Int textureWidthHeight = new Vector2Int(320, 180);
 
-    [SerializeField]
+    [SerializeField, Range(1, 500)]
     int samplesPerPixel = 8;
 
-    [SerializeField]
+    [SerializeField, Range(1, 50)]
     int maxDepth = 8;
 
 
 
 
-    [SerializeField, ReadOnly]
+    [SerializeField]
     private Texture2D texResult;
 
 
@@ -138,6 +135,33 @@ public class RayTracingInOneWeekend : MonoBehaviour
                 var chooseMat = Random.value;
                 var center = new Vector3((float)i + 0.9f * Random.value, 0.2f, (float)j + 0.9f * Random.value);
 
+                if ((center - new Vector3(4f, 0.2f, 0f)).magnitude <= 0.9f)
+                {
+                    continue;
+                }
+
+
+                if (chooseMat < 0.8f)
+                {
+                    // diffuse
+                    var albedo = Random.ColorHSV();
+                    var mat = new LambertainMaterial(albedo);
+                    world.Add(new Sphere(center, 0.2f, mat));
+                }
+                else if (chooseMat < 0.95f)
+                {
+                    // metal
+                    var albedo = Random.ColorHSV();
+                    float fuzz = Random.Range(0f, 0.5f);
+                    var mat = new FuzzyMetalMaterial(albedo, fuzz);
+                    world.Add(new Sphere(center, 0.2f, mat));
+                }
+                else
+                {
+                    // glass
+                    var mat = new DielectricMaterial(1.5f);
+                    world.Add(new Sphere(center, 0.2f, mat));
+                }
 
             }
         }
@@ -162,20 +186,6 @@ public class RayTracingInOneWeekend : MonoBehaviour
         texResult = new Texture2D(textureWidth, textureHeight, TextureFormat.RGBA32, false, true);
 
         // world
-        /*var matGround = new LambertainMaterial(new Color(0.8f, 0.8f, 0f));
-        var matCenter = new LambertainMaterial(new Color(0.1f, 0.2f, 0.5f));
-        //var matLeft = new MetalMaterial(new Color(0.8f, 0.8f, 0.8f));
-        var matLeft = new DielectricMaterial(1.5f);
-        var matRight = new FuzzyMetalMaterial(new Color(0.8f, 0.6f, 0.2f), 0.7f);
-
-        HittableList world = new HittableList();
-        world.Add(new Sphere(new Vector3(0f, -100.5f, 0f), 100f, matGround));
-        world.Add(new Sphere(new Vector3(0f, 0f, 1f), 0.5f, matCenter));
-        world.Add(new Sphere(new Vector3(-1f, 0f, 0f), 0.5f, matLeft));
-        world.Add(new Sphere(new Vector3(-1f, 0f, 0f), -0.4f, matLeft));
-        world.Add(new Sphere(new Vector3(1f, 0f, 0f), 0.5f, matRight));
-        */
-
         HittableList world = RandomScene();
 
         // camera
@@ -183,6 +193,8 @@ public class RayTracingInOneWeekend : MonoBehaviour
         cam = cam ? cam : new RayCamera();
         cam.Setup((float)textureWidth / (float)textureHeight);
 
+
+        float startTime = Time.realtimeSinceStartup;
 
         // render
         for (int y = 0; y < textureHeight; y++)
@@ -204,6 +216,8 @@ public class RayTracingInOneWeekend : MonoBehaviour
         }
 
         texResult.Apply();
+
+        Debug.Log($"Render time : {Time.realtimeSinceStartup - startTime} sec");
 
     }
 
