@@ -358,8 +358,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fc6fa23d0e5c0bd4f822028aad86aa06, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  verticalFov: 70
-  focalLength: 1
-  lookFrom: {x: 0, y: 2, z: -2}
+  verticalFov: 20
+  lookFrom: {x: 13, y: 2, z: 3}
   lookAt: {x: 0, y: 0, z: 0}
   vup: {x: 0, y: 1, z: 0}
+  aperture: 0.1
+  viewportWidth: 0
+  viewportHeight: 0
+  horizontal: {x: 0, y: 0, z: 0}
+  vertical: {x: 0, y: 0, z: 0}
+  lowerLeftCorner: {x: 0, y: 0, z: 0}
+  lensRadius: 0
+  focusDistance: 0
+  w: {x: 0, y: 0, z: 0}
+  u: {x: 0, y: 0, z: 0}
+  v: {x: 0, y: 0, z: 0}

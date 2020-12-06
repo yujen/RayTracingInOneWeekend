@@ -123,6 +123,36 @@ public class RayTracingInOneWeekend : MonoBehaviour
     }
 
 
+    HittableList RandomScene()
+    {
+        var world = new HittableList();
+
+        var matGround = new LambertainMaterial(new Color(0.5f, 0.5f, 0.5f));
+        world.Add(new Sphere(new Vector3(0f, -1000f, 0f), 1000f, matGround));
+
+
+        for (int i = -11; i < 11; i++)
+        {
+            for (int j = -11; j < 11; j++)
+            {
+                var chooseMat = Random.value;
+                var center = new Vector3((float)i + 0.9f * Random.value, 0.2f, (float)j + 0.9f * Random.value);
+
+
+            }
+        }
+
+        var mat1 = new DielectricMaterial(1.5f);
+        world.Add(new Sphere(new Vector3(0f, 1f, 0f), 1f, mat1));
+
+        var mat2 = new LambertainMaterial(new Color(0.4f, 0.2f, 0.1f));
+        world.Add(new Sphere(new Vector3(-4f, 1f, 0f), 1.0f, mat2));
+
+        var mat3 = new FuzzyMetalMaterial(new Color(0.7f, 0.6f, 0.5f), 0f);
+        world.Add(new Sphere(new Vector3(4f, 1f, 0f), 1f, mat3));
+
+        return world;
+    }
 
     void Start()
     {
@@ -132,7 +162,7 @@ public class RayTracingInOneWeekend : MonoBehaviour
         texResult = new Texture2D(textureWidth, textureHeight, TextureFormat.RGBA32, false, true);
 
         // world
-        var matGround = new LambertainMaterial(new Color(0.8f, 0.8f, 0f));
+        /*var matGround = new LambertainMaterial(new Color(0.8f, 0.8f, 0f));
         var matCenter = new LambertainMaterial(new Color(0.1f, 0.2f, 0.5f));
         //var matLeft = new MetalMaterial(new Color(0.8f, 0.8f, 0.8f));
         var matLeft = new DielectricMaterial(1.5f);
@@ -140,12 +170,13 @@ public class RayTracingInOneWeekend : MonoBehaviour
 
         HittableList world = new HittableList();
         world.Add(new Sphere(new Vector3(0f, -100.5f, 0f), 100f, matGround));
-        world.Add(new Sphere(new Vector3(0f, 0f, 0f), 0.5f, matCenter));
+        world.Add(new Sphere(new Vector3(0f, 0f, 1f), 0.5f, matCenter));
         world.Add(new Sphere(new Vector3(-1f, 0f, 0f), 0.5f, matLeft));
         world.Add(new Sphere(new Vector3(-1f, 0f, 0f), -0.4f, matLeft));
         world.Add(new Sphere(new Vector3(1f, 0f, 0f), 0.5f, matRight));
+        */
 
-
+        HittableList world = RandomScene();
 
         // camera
         var cam = GetComponent<RayCamera>();
