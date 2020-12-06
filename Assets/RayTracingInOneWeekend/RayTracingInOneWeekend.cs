@@ -6,11 +6,6 @@
 
 public class RayTracingInOneWeekend : MonoBehaviour
 {
-    //[SerializeField]
-    //int textureWidth = 160;
-    //[SerializeField]
-    //int textureHeight = 90;
-
     [SerializeField]
     Vector2Int textureWidthHeight = new Vector2Int(320, 180);
 
@@ -20,27 +15,12 @@ public class RayTracingInOneWeekend : MonoBehaviour
     [SerializeField, Range(1, 50)]
     int maxDepth = 8;
 
-
-
-
     [SerializeField]
     private Texture2D texResult;
 
 
 
 
-    Vector3 RandomInsideUnitHemisphere(Vector3 normal)
-    {
-        var unitSphere = Random.insideUnitSphere;
-        if (Vector3.Dot(unitSphere, normal) > 0f)
-        {
-            return unitSphere;
-        }
-        else
-        {
-            return -unitSphere;
-        }
-    }
 
     Color RayColor(Ray ray, Hittable world, int depth)
     {
@@ -220,9 +200,5 @@ public class RayTracingInOneWeekend : MonoBehaviour
         Debug.Log($"Render time : {Time.realtimeSinceStartup - startTime} sec");
 
     }
-
-
-
-
 
 }
