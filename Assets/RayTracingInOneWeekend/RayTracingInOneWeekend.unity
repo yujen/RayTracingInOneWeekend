@@ -310,7 +310,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 234fec3ea45640242b041f24b34804b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  textureWidthHeight: {x: 640, y: 360}
+  textureWidthHeight: {x: 320, y: 180}
   samplesPerPixel: 8
   maxDepth: 8
   texResult: {fileID: 0}

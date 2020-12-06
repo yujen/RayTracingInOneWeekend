@@ -42,10 +42,7 @@ public class HitRecord
     public Vector3 normal;
     public float t;
     public ObjectMaterial objMaterial;
-
-
-
-    bool frontFace;
+    public bool frontFace;
 
 
     public void SetFaceNormal(Ray ray, Vector3 outwardNormal)
