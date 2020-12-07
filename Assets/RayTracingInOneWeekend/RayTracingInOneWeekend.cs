@@ -1,6 +1,6 @@
-﻿using UnityEngine;
-
-
+﻿
+using System.IO;
+using UnityEngine;
 
 
 
@@ -16,7 +16,7 @@ public class RayTracingInOneWeekend : MonoBehaviour
     int maxDepth = 8;
 
     [SerializeField]
-    private Texture2D texResult;
+    private Texture2D textureResult;
 
 
 
@@ -163,7 +163,7 @@ public class RayTracingInOneWeekend : MonoBehaviour
         // image
         int textureWidth = textureWidthHeight.x;
         int textureHeight = textureWidthHeight.y;
-        texResult = new Texture2D(textureWidth, textureHeight, TextureFormat.RGBA32, false, true);
+        textureResult = new Texture2D(textureWidth, textureHeight, TextureFormat.RGBA32, false, true);
 
         // world
         HittableList world = RandomScene();
@@ -191,14 +191,31 @@ public class RayTracingInOneWeekend : MonoBehaviour
                     var ray = cam.GetRay(u, v);
                     pixelColor += RayColor(ray, world, maxDepth);
                 }
-                WriteColor(texResult, x, y, pixelColor, samplesPerPixel);
+                WriteColor(textureResult, x, y, pixelColor, samplesPerPixel);
             }
         }
 
-        texResult.Apply();
+        textureResult.Apply();
+        Debug.Log($"Render time: {Time.realtimeSinceStartup - startTime} sec");
 
-        Debug.Log($"Render time : {Time.realtimeSinceStartup - startTime} sec");
+        try
+        {
+            string dir = Path.Combine(Directory.GetCurrentDirectory(), "output_images");
+            Directory.CreateDirectory(dir);
+
+            string pngPath = Path.Combine(dir, $"{System.DateTime.Now.Ticks}.png");
+
+            var pngData = textureResult.EncodeToPNG();
+            File.WriteAllBytes(pngPath, pngData);
+
+            Debug.Log($"Save to: {pngPath}");
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError(e);
+        }
 
     }
+
 
 }
