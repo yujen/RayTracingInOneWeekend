@@ -7,26 +7,28 @@ using UnityEngine;
 
 public class RayCamera : MonoBehaviour
 {
-    [Header("RayCamera參數")]
+    [Header("RayCamera Parameter")]
 
     /// <summary>
     /// vertical field-of-view in degrees
     /// </summary>
     [SerializeField]
-    public float verticalFov = 70f;
+    public float verticalFov = 20f;
 
     [SerializeField]
-    public Vector3 lookFrom = new Vector3(-2f, 2f, 1f);
+    public Vector3 lookFrom = new Vector3(13f, 2f, 3f);
     [SerializeField]
     public Vector3 lookAt = Vector3.zero;
     [SerializeField]
     public Vector3 vup = Vector3.up;
 
     [SerializeField]
-    public float aperture = 2f;
+    public float focusDistance = 10f;
+    [SerializeField]
+    public float aperture = 0.1f;
     
 
-    [Header("Debug用 執行時會被重新複寫 無法修改")]
+    [Header("Debug Value")]
 
     public float viewportWidth;
     public float viewportHeight;
@@ -34,7 +36,6 @@ public class RayCamera : MonoBehaviour
     public Vector3 vertical;
     public Vector3 lowerLeftCorner;
     public float lensRadius;
-    public float focusDistance;
 
     public Vector3 w;
     public Vector3 u;
@@ -55,7 +56,7 @@ public class RayCamera : MonoBehaviour
         v = Vector3.Cross(w, u);
 
 
-        focusDistance = (lookFrom - lookAt).magnitude;
+        //focusDistance = (lookFrom - lookAt).magnitude;
 
         horizontal = focusDistance * viewportWidth * u;
         vertical = focusDistance * viewportHeight * v;
