@@ -52,7 +52,7 @@ public class LambertainMaterial : ObjectMaterial
             scatterDirection = hitRecord.normal;
         }
 
-        scatteredrRay = new Ray(hitRecord.p, scatterDirection);
+        scatteredrRay = new Ray(hitRecord.p, scatterDirection, inRay.time);
         attenuation = albedo;
         return true;
     }
@@ -74,7 +74,7 @@ public class MetalMaterial : ObjectMaterial
     public override bool Scatter(Ray inRay, HitRecord hitRecord, out Color attenuation, out Ray scatteredrRay)
     {
         var reflected = Reflect(inRay.direction.normalized, hitRecord.normal);
-        scatteredrRay = new Ray(hitRecord.p, reflected);
+        scatteredrRay = new Ray(hitRecord.p, reflected, inRay.time);
         attenuation = albedo;
         return (Vector3.Dot(scatteredrRay.direction, hitRecord.normal) > 0f);
     }
@@ -95,7 +95,7 @@ public class FuzzyMetalMaterial : MetalMaterial
     public override bool Scatter(Ray inRay, HitRecord hitRecord, out Color attenuation, out Ray scatteredrRay)
     {
         var reflected = Reflect(inRay.direction.normalized, hitRecord.normal);
-        scatteredrRay = new Ray(hitRecord.p, reflected + Random.insideUnitSphere * fuzz);
+        scatteredrRay = new Ray(hitRecord.p, reflected + Random.insideUnitSphere * fuzz, inRay.time);
         attenuation = albedo;
         return (Vector3.Dot(scatteredrRay.direction, hitRecord.normal) > 0f);
     }
@@ -139,7 +139,7 @@ public class DielectricMaterial : ObjectMaterial
             direction = Refract(unit_direction, hitRecord.normal, refraction_ratio);
         }
 
-        scatteredrRay = new Ray(hitRecord.p, direction);
+        scatteredrRay = new Ray(hitRecord.p, direction, inRay.time);
 
         return true;
     }

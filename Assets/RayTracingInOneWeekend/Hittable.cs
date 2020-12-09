@@ -12,30 +12,6 @@ public abstract class Hittable
 }
 
 
-public class Ray
-{
-    public Ray(Vector3 origin, Vector3 direction)
-    {
-        this.origin = origin;
-        this.direction = direction;
-    }
-
-    /// <summary>
-    /// 射線頂端位置
-    /// </summary>
-    public Vector3 At(float t)
-    {
-        return origin + direction * t;
-    }
-
-
-    public Vector3 origin;
-    /// <summary>
-    /// ray方向, 不一定是單位向量
-    /// </summary>
-    public Vector3 direction;
-}
-
 public class HitRecord
 {
     public Vector3 p;
@@ -53,4 +29,39 @@ public class HitRecord
 
 }
 
+public class HittableList : Hittable
+{
+    private List<Hittable> listHittable = new List<Hittable>();
+
+
+    public void Add(Hittable hittable)
+    {
+        listHittable.Add(hittable);
+    }
+
+    public void Clear()
+    {
+        listHittable.Clear();
+    }
+
+
+    public override bool IsHit(Ray ray, float t_min, float t_max, ref HitRecord hitRecord)
+    {
+        HitRecord tempRec = new HitRecord();
+        bool hitAnything = false;
+        float closestSoFar = t_max;
+
+        foreach (var hittable in listHittable)
+        {
+            if (hittable.IsHit(ray, t_min, closestSoFar, ref tempRec))
+            {
+                hitAnything = true;
+                closestSoFar = tempRec.t;
+                hitRecord = tempRec;
+            }
+        }
+
+        return hitAnything;
+    }
+}
 

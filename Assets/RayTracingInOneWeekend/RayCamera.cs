@@ -26,7 +26,16 @@ public class RayCamera : MonoBehaviour
     public float focusDistance = 10f;
     [SerializeField]
     public float aperture = 0.1f;
-    
+
+
+    /// <summary>
+    /// shutter open/close times
+    /// </summary>
+    [SerializeField]
+    public Vector2 shutterTime;     //  time0, time1;
+
+
+
 
     [Header("Debug Value")]
 
@@ -73,7 +82,10 @@ public class RayCamera : MonoBehaviour
         var rd = lensRadius * Random.insideUnitCircle;
         var offset = u * rd.x + v * rd.y;
 
-        return new Ray(lookFrom + offset, lowerLeftCorner + (s * horizontal) + (t * vertical) - lookFrom - offset);
+        return new Ray(
+            lookFrom + offset, 
+            lowerLeftCorner + (s * horizontal) + (t * vertical) - lookFrom - offset,
+            Random.Range(shutterTime.x, shutterTime.y));
     }
 
 

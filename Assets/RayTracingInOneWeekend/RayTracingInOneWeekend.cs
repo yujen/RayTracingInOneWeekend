@@ -53,20 +53,6 @@ public class RayTracingInOneWeekend : MonoBehaviour
         return (1f - offset) * Color.white + offset * new Color(0.5f, 0.7f, 1f);
     }
 
-    Color RayColor2(Ray ray, Hittable world)
-    {
-        HitRecord hitRecord = null;
-        if (world.IsHit(ray, 0f, float.MaxValue, ref hitRecord))
-        {
-            var normal = hitRecord.normal;
-            return new Color((normal.x + 1f), (normal.y + 1f), (normal.z + 1f)) * 0.5f;
-        }
-
-        // background
-        var unitDirection = ray.direction.normalized;
-        float offset = (unitDirection.y + 1f) * 0.5f;
-        return (1f - offset) * Color.white + offset * new Color(0.5f, 0.7f, 1f);
-    }
 
 
 
@@ -126,7 +112,8 @@ public class RayTracingInOneWeekend : MonoBehaviour
                     // diffuse
                     var albedo = Random.ColorHSV();
                     var mat = new LambertainMaterial(albedo);
-                    world.Add(new Sphere(center, 0.2f, mat));
+                    var center1 = center + new Vector3(0f, Random.Range(0f, 0.5f), 0f);
+                    world.Add(new MovingSphere(center, center1, 0f, 1f, 0.2f, mat));
                 }
                 else if (chooseMat < 0.95f)
                 {
