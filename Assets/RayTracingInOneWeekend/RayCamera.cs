@@ -32,7 +32,7 @@ public class RayCamera : MonoBehaviour
     /// shutter open/close times
     /// </summary>
     [SerializeField]
-    public Vector2 shutterTime;     //  time0, time1;
+    public Vector2 shutterTime = new Vector2(0f, 1f);     //  time0, time1;
 
 
 
