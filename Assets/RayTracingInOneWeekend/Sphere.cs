@@ -50,6 +50,7 @@ public class Sphere : Hittable
         Vector3 outwardNormal = (hitRecord.p - center) / radius;
         hitRecord.SetFaceNormal(ray, outwardNormal);
         hitRecord.objMaterial = objMaterial;
+        hitRecord.uv = GetUV(outwardNormal);
 
         return true;
     }
