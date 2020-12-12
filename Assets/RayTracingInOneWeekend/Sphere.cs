@@ -53,6 +53,15 @@ public class Sphere : Hittable
 
         return true;
     }
+
+    public override bool BoundingBox(float time0, float time1, out AABB output)
+    {
+        var pos = new Vector3(radius, radius, radius);
+        output = new AABB(center - pos, center + pos);
+
+        return true;
+    }
+
 }
 
 
@@ -117,5 +126,20 @@ class MovingSphere : Hittable
 
         return true;
     }
+
+    public override bool BoundingBox(float time0, float time1, out AABB output)
+    {
+        var pos = new Vector3(radius, radius, radius);
+
+        var center0 = GetCenter(time0);
+        var aabb0 = new AABB(center0 - pos, center0 + pos);
+        var center1 = GetCenter(time1);
+        var aabb1 = new AABB(center1 - pos, center1 + pos);
+
+        output = SurroundingBox(aabb0, aabb1);
+
+        return true;
+    }
+
 }
 

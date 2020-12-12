@@ -371,6 +371,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   textureWidthHeight: {x: 320, y: 180}
-  samplesPerPixel: 8
-  maxDepth: 8
+  samplesPerPixel: 4
+  maxDepth: 4
   textureResult: {fileID: 0}
