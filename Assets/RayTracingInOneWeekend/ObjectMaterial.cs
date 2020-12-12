@@ -15,7 +15,7 @@ abstract public class ObjectMaterial
         float s = 0.0001f;
         return (Mathf.Abs(v.x) < s) && (Mathf.Abs(v.y) < s) && (Mathf.Abs(v.z) < s);
     }
-
+    
 
     public Vector3 Reflect(Vector3 v, Vector3 n)
     {
@@ -39,7 +39,7 @@ abstract public class ObjectMaterial
 
 public class LambertainMaterial : ObjectMaterial
 {
-    public Color albedo;
+    protected ObjectTexture albedo;
 
 
     override public bool Scatter(Ray inRay, HitRecord hitRecord, out Color attenuation, out Ray scatteredrRay)
@@ -53,14 +53,17 @@ public class LambertainMaterial : ObjectMaterial
         }
 
         scatteredrRay = new Ray(hitRecord.p, scatterDirection, inRay.time);
-        attenuation = albedo;
+        attenuation = albedo.Value(hitRecord.uv, hitRecord.p);
         return true;
     }
 
-    public LambertainMaterial(Color albedo)
+
+    public LambertainMaterial(ObjectTexture t)
     {
-        this.albedo = albedo;
+        this.albedo = t;
     }
+
+    public LambertainMaterial(Color albedo) : this(new SolidColor(albedo)) { }
 
 }
 
@@ -68,7 +71,7 @@ public class LambertainMaterial : ObjectMaterial
 
 public class MetalMaterial : ObjectMaterial
 {
-    public Color albedo;
+    protected Color albedo;
 
 
     public override bool Scatter(Ray inRay, HitRecord hitRecord, out Color attenuation, out Ray scatteredrRay)
@@ -89,7 +92,7 @@ public class MetalMaterial : ObjectMaterial
 
 public class FuzzyMetalMaterial : MetalMaterial
 {
-    public float fuzz;
+    protected float fuzz;
 
 
     public override bool Scatter(Ray inRay, HitRecord hitRecord, out Color attenuation, out Ray scatteredrRay)
@@ -114,7 +117,7 @@ public class DielectricMaterial : ObjectMaterial
     /// <summary>
     /// Refractive index
     /// </summary>
-    public float indexOfRefraction;
+    protected float indexOfRefraction;
 
 
     public override bool Scatter(Ray inRay, HitRecord hitRecord, out Color attenuation, out Ray scatteredrRay)

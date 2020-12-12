@@ -12,7 +12,7 @@ public class AABB
     public Vector3 max { get; private set; }
 
 
-    public AABB() { }
+
 
     public AABB(Vector3 min, Vector3 max)
     {

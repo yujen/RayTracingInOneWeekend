@@ -37,6 +37,12 @@ public class HitRecord
     public ObjectMaterial objMaterial;
     public bool frontFace;
 
+    /// <summary>
+    /// ObjectTexture's UV
+    /// </summary>
+    public Vector2 uv;
+
+
 
     public void SetFaceNormal(Ray ray, Vector3 outwardNormal)
     {
@@ -49,7 +55,7 @@ public class HitRecord
 
 public class HittableList : Hittable
 {
-    public List<Hittable> listHittable = new List<Hittable>();
+    protected List<Hittable> listHittable = new List<Hittable>();
 
 
     public void Add(Hittable hittable)
@@ -113,8 +119,8 @@ public class HittableList : Hittable
 
 public class BVHNode : Hittable
 {
-    public Hittable leftNode, rightNode;
-    public AABB box;
+    protected Hittable leftNode, rightNode;
+    protected AABB box;
 
 
 

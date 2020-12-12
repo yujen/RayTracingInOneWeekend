@@ -90,8 +90,11 @@ public class RayTracingInOneWeekend : MonoBehaviour
     {
         var world = new HittableList();
 
-        var matGround = new LambertainMaterial(new Color(0.5f, 0.5f, 0.5f));
+        var texChecker = new CheckerTexture(new Color(0.2f, 0.3f, 0.1f), new Color(0.9f, 0.9f, 0.9f));
+        var matGround = new LambertainMaterial(texChecker);
         world.Add(new Sphere(new Vector3(0f, -1000f, 0f), 1000f, matGround));
+
+
 
 
         for (int i = -11; i < 11; i++)

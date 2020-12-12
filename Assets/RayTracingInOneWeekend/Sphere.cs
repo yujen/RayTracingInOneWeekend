@@ -62,6 +62,21 @@ public class Sphere : Hittable
         return true;
     }
 
+
+    /// <summary>
+    /// Texture coordinates for sphere
+    /// </summary>
+    /// <param name="p">A given point on the sphere of radius one, centered at the origin.</param>
+    public Vector2 GetUV(Vector3 p)
+    {
+        float theta = Mathf.Acos(-p.y);
+        float phi = Mathf.Atan2(-p.z, p.x) + Mathf.PI;
+        float u = phi / (2f * Mathf.PI);
+        float v = theta / Mathf.PI;
+
+        return new Vector2(u, v);
+    }
+
 }
 
 
