@@ -7,7 +7,7 @@ using UnityEngine;
 
 public class RayCamera : MonoBehaviour
 {
-    [Header("RayCamera Parameter")]
+    [Header("RayCamera Parameters")]
 
     /// <summary>
     /// vertical field-of-view in degrees

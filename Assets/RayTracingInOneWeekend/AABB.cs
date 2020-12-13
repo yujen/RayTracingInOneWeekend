@@ -4,7 +4,7 @@ using UnityEngine;
 
 
 /// <summary>
-/// Axis-Aligned Bounding Boxe
+/// Axis-Aligned Bounding Box
 /// </summary>
 public class AABB
 {
@@ -50,6 +50,7 @@ public class AABB
         return true;
 
     }
+
     /*
     public bool IsHit(Ray r, float t_min, float t_max)
     {

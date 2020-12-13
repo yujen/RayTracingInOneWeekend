@@ -4,8 +4,20 @@ using UnityEngine;
 
 
 
+public enum Scene
+{
+    RandomSphereScene,
+    TwoSphereScene,
+}
+
+
 public class RayTracingInOneWeekend : MonoBehaviour
 {
+    [Header("RayTracing Parameters")]
+
+    [SerializeField]
+    Scene scene;
+
     [SerializeField]
     Vector2Int textureWidthHeight = new Vector2Int(320, 180);
 
@@ -86,17 +98,16 @@ public class RayTracingInOneWeekend : MonoBehaviour
     }
 
 
-    HittableList RandomScene()
+    HittableList RandomSphereScene()
     {
-        var world = new HittableList();
+        var listObj = new HittableList();
 
+        //
         var texChecker = new CheckerTexture(new Color(0.2f, 0.3f, 0.1f), new Color(0.9f, 0.9f, 0.9f));
         var matGround = new LambertainMaterial(texChecker);
-        world.Add(new Sphere(new Vector3(0f, -1000f, 0f), 1000f, matGround));
+        listObj.Add(new Sphere(new Vector3(0f, -1000f, 0f), 1000f, matGround));
 
-
-
-
+        //
         for (int i = -11; i < 11; i++)
         {
             for (int j = -11; j < 11; j++)
@@ -116,7 +127,7 @@ public class RayTracingInOneWeekend : MonoBehaviour
                     var albedo = Random.ColorHSV();
                     var mat = new LambertainMaterial(albedo);
                     var center1 = center + new Vector3(0f, Random.Range(0f, 0.5f), 0f);
-                    world.Add(new MovingSphere(center, center1, 0f, 1f, 0.2f, mat));
+                    listObj.Add(new MovingSphere(center, center1, 0f, 1f, 0.2f, mat));
                 }
                 else if (chooseMat < 0.95f)
                 {
@@ -124,29 +135,45 @@ public class RayTracingInOneWeekend : MonoBehaviour
                     var albedo = Random.ColorHSV();
                     float fuzz = Random.Range(0f, 0.5f);
                     var mat = new FuzzyMetalMaterial(albedo, fuzz);
-                    world.Add(new Sphere(center, 0.2f, mat));
+                    listObj.Add(new Sphere(center, 0.2f, mat));
                 }
                 else
                 {
                     // glass
                     var mat = new DielectricMaterial(1.5f);
-                    world.Add(new Sphere(center, 0.2f, mat));
+                    listObj.Add(new Sphere(center, 0.2f, mat));
                 }
 
             }
         }
 
+        //
         var mat1 = new DielectricMaterial(1.5f);
-        world.Add(new Sphere(new Vector3(0f, 1f, 0f), 1f, mat1));
+        listObj.Add(new Sphere(new Vector3(0f, 1f, 0f), 1f, mat1));
 
         var mat2 = new LambertainMaterial(new Color(0.4f, 0.2f, 0.1f));
-        world.Add(new Sphere(new Vector3(-4f, 1f, 0f), 1.0f, mat2));
+        listObj.Add(new Sphere(new Vector3(-4f, 1f, 0f), 1.0f, mat2));
 
         var mat3 = new FuzzyMetalMaterial(new Color(0.7f, 0.6f, 0.5f), 0f);
-        world.Add(new Sphere(new Vector3(4f, 1f, 0f), 1f, mat3));
+        listObj.Add(new Sphere(new Vector3(4f, 1f, 0f), 1f, mat3));
 
-        return world;
+        return listObj;
     }
+
+    HittableList TwoSphereScene()
+    {
+        var listObj = new HittableList();
+
+        var texChecker = new CheckerTexture(new Color(0.2f, 0.3f, 0.1f), new Color(0.9f, 0.9f, 0.9f));
+        var matGround = new LambertainMaterial(texChecker);
+
+        listObj.Add(new Sphere(new Vector3(0f, -10f, 0f), 10f, matGround));
+        listObj.Add(new Sphere(new Vector3(0f, 10f, 0f), 10f, matGround));
+
+        return listObj;
+    }
+
+
 
     void Start()
     {
@@ -155,8 +182,19 @@ public class RayTracingInOneWeekend : MonoBehaviour
         int textureHeight = textureWidthHeight.y;
         textureResult = new Texture2D(textureWidth, textureHeight, TextureFormat.RGBA32, false, true);
 
-        // world
-        HittableList world = RandomScene();
+        // scene
+        HittableList listSceneObj;
+        switch (scene)
+        {
+            case Scene.RandomSphereScene:
+            default:
+                listSceneObj = RandomSphereScene();
+                break;
+
+            case Scene.TwoSphereScene:
+                listSceneObj = TwoSphereScene();
+                break;
+        }
 
         // camera
         var cam = GetComponent<RayCamera>();
@@ -179,7 +217,7 @@ public class RayTracingInOneWeekend : MonoBehaviour
                     float v = ((float)y + GetRandomNum()) / (textureHeight - 1);
 
                     var ray = cam.GetRay(u, v);
-                    pixelColor += RayColor(ray, world, maxDepth);
+                    pixelColor += RayColor(ray, listSceneObj, maxDepth);
                 }
                 WriteColor(textureResult, x, y, pixelColor, samplesPerPixel);
             }

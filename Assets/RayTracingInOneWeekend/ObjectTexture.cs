@@ -53,15 +53,8 @@ public class CheckerTexture : ObjectTexture
     public override Color Value(Vector2 uv, Vector3 p)
     {
         float sines = Mathf.Sin(10f * p.x) * Mathf.Sin(10f * p.y) * Mathf.Sin(10f * p.z);
-        if (sines < 0f)
-        {
-            return odd.Value(uv, p);
-        }
-        else
-        {
-            return even.Value(uv, p);
-        }
-
+        return (sines < 0f) ? odd.Value(uv, p) : even.Value(uv, p);
     }
+
 }
 
