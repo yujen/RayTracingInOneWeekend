@@ -149,6 +149,22 @@ public class PerlinNoise
         return accum;
     }
 
+    public float TurbulenceValue(Vector3 p, int depth = 7)
+    {
+        Vector3 temp_p = p;
+        float weight = 1f;
+        float accum = 0f;
+
+        for (int i = 0; i < depth; i++)
+        {
+            accum += weight * PerlinInterpValue(temp_p);
+            weight *= 0.5f;
+            temp_p *= 2f;
+        }
+
+        return Mathf.Abs(accum);
+    }
+
 
 
     private int[] PerlinGeneratePerm()

@@ -178,11 +178,11 @@ public class RayTracingInOneWeekend : MonoBehaviour
     {
         var listObj = new HittableList();
 
-        var tex = new NoiseTexture(4f);
-        var mat = new LambertainMaterial(tex);
+        var mat_0 = new LambertainMaterial(new NoiseTexture(4f));
+        var mat_1 = new LambertainMaterial(new MarbleTexture(4f));
 
-        listObj.Add(new Sphere(new Vector3(0f, -1000f, 0f), 1000f, mat));
-        listObj.Add(new Sphere(new Vector3(0f, 2f, 0f), 2f, mat));
+        listObj.Add(new Sphere(new Vector3(0f, -1000f, 0f), 1000f, mat_1));
+        listObj.Add(new Sphere(new Vector3(0f, 2f, 0f), 2f, mat_1));
 
         return listObj;
     }

@@ -61,12 +61,12 @@ public class CheckerTexture : ObjectTexture
 
 public class NoiseTexture : ObjectTexture
 {
-    private PerlinNoise perlinNoise;
-    private float scale;
+    protected PerlinNoise perlinNoise;
+    protected float scale;
 
 
 
-    public NoiseTexture(float scale)
+    public NoiseTexture(float scale = 4f)
     {
         perlinNoise = new PerlinNoise();
         this.scale = scale;
@@ -76,7 +76,24 @@ public class NoiseTexture : ObjectTexture
     {
         //return Color.white * perlinNoise.Value(p * scale);
         //return Color.white * perlinNoise.TrilinearInterpValue(p * scale);
-        return Color.white * 0.5f * (1f + perlinNoise.PerlinInterpValue(p * scale));
+        //return Color.white * 0.5f * (1f + perlinNoise.PerlinInterpValue(p * scale));
+        return Color.white * perlinNoise.TurbulenceValue(p * scale);
     }
 }
+
+/// <summary>
+/// Marble-like texture
+/// </summary>
+public class MarbleTexture : NoiseTexture
+{
+
+    public MarbleTexture(float scale = 4f) : base(scale) { }
+
+
+    public override Color Value(Vector2 uv, Vector3 p)
+    {
+        return Color.white * 0.5f * (1f + Mathf.Sin(scale * p.z + 10f * perlinNoise.TurbulenceValue(p)));
+    }
+}
+
 
