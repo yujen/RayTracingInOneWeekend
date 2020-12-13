@@ -62,18 +62,21 @@ public class CheckerTexture : ObjectTexture
 public class NoiseTexture : ObjectTexture
 {
     private PerlinNoise perlinNoise;
+    private float scale;
 
 
 
-
-    public NoiseTexture()
+    public NoiseTexture(float scale)
     {
         perlinNoise = new PerlinNoise();
+        this.scale = scale;
     }
 
     public override Color Value(Vector2 uv, Vector3 p)
     {
-        return Color.white * perlinNoise.Value(p);
+        //return Color.white * perlinNoise.Value(p * scale);
+        //return Color.white * perlinNoise.TrilinearInterpValue(p * scale);
+        return Color.white * 0.5f * (1f + perlinNoise.PerlinInterpValue(p * scale));
     }
 }
 
