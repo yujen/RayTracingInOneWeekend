@@ -77,7 +77,8 @@ public class NoiseTexture : ObjectTexture
         //return Color.white * perlinNoise.Value(p * scale);
         //return Color.white * perlinNoise.TrilinearInterpValue(p * scale);
         //return Color.white * 0.5f * (1f + perlinNoise.PerlinInterpValue(p * scale));
-        return Color.white * perlinNoise.TurbulenceValue(p * scale);
+        float c = perlinNoise.TurbulenceValue(p * scale);
+        return new Color(c, c, c, 1f);
     }
 }
 
@@ -92,8 +93,59 @@ public class MarbleTexture : NoiseTexture
 
     public override Color Value(Vector2 uv, Vector3 p)
     {
-        return Color.white * 0.5f * (1f + Mathf.Sin(scale * p.z + 10f * perlinNoise.TurbulenceValue(p)));
+        float c = 0.5f * (1f + Mathf.Sin(scale * p.z + 10f * perlinNoise.TurbulenceValue(p)));
+        return new Color(c, c, c, 1f);
     }
 }
 
+
+public class ImageTexture : ObjectTexture
+{
+    protected Texture2D image;
+    protected int width, height;
+
+
+
+    public ImageTexture(Texture2D image)
+    {
+        if (image == null)
+        {
+            Debug.LogError("Could not load texture image file");
+            return;
+        }
+
+        this.image = image;
+
+        width = image.width;
+        height = image.height;
+    }
+
+    public ImageTexture(string imagePath) : this(Resources.Load<Texture2D>(imagePath)) { }
+
+
+
+    public override Color Value(Vector2 uv, Vector3 p)
+    {
+        // If we have no texture data, then return solid cyan as a debugging aid.
+        if (image == null)
+        {
+            return new Color(0f, 1f, 1f);
+        }
+
+        // Clamp input texture coordinates to [0,1] x [1,0]
+        float u = Mathf.Clamp01(uv.x);
+        float v = Mathf.Clamp01(uv.y);
+        //float v = 1f - Mathf.Clamp01(uv.y); // Flip V to image coordinates
+
+
+        int i = (int)(u * width);
+        int j = (int)(v * height);
+
+        // Clamp integer mapping, since actual coordinates should be less than 1.0
+        i = (i < width) ? i : (width - 1);
+        j = (j < height) ? j : (height - 1);
+
+        return image.GetPixel(i, j);
+    }
+}
 

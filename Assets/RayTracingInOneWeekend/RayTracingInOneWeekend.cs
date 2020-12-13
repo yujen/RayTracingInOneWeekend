@@ -9,6 +9,7 @@ public enum Scene
     RandomSphereScene,
     TwoSphereScene,
     TwoPerlinNoiseSphereScene,
+    EarthScene,
 }
 
 
@@ -181,8 +182,20 @@ public class RayTracingInOneWeekend : MonoBehaviour
         var mat_0 = new LambertainMaterial(new NoiseTexture(4f));
         var mat_1 = new LambertainMaterial(new MarbleTexture(4f));
 
-        listObj.Add(new Sphere(new Vector3(0f, -1000f, 0f), 1000f, mat_1));
+        listObj.Add(new Sphere(new Vector3(0f, -1000f, 0f), 1000f, mat_0));
         listObj.Add(new Sphere(new Vector3(0f, 2f, 0f), 2f, mat_1));
+
+        return listObj;
+    }
+
+    HittableList EarthScene()
+    {
+        var listObj = new HittableList();
+
+        var tex = new ImageTexture("earthmap");
+        var mat = new LambertainMaterial(tex);
+
+        listObj.Add(new Sphere(new Vector3(0f, 0f, 0f), 2f, mat));
 
         return listObj;
     }
@@ -211,6 +224,10 @@ public class RayTracingInOneWeekend : MonoBehaviour
 
             case Scene.TwoPerlinNoiseSphereScene:
                 listSceneObj = TwoPerlinNoiseSphereScene();
+                break;
+
+            case Scene.EarthScene:
+                listSceneObj = EarthScene();
                 break;
         }
 
