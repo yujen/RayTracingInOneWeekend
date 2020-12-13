@@ -58,3 +58,22 @@ public class CheckerTexture : ObjectTexture
 
 }
 
+
+public class NoiseTexture : ObjectTexture
+{
+    private PerlinNoise perlinNoise;
+
+
+
+
+    public NoiseTexture()
+    {
+        perlinNoise = new PerlinNoise();
+    }
+
+    public override Color Value(Vector2 uv, Vector3 p)
+    {
+        return Color.white * perlinNoise.Value(p);
+    }
+}
+

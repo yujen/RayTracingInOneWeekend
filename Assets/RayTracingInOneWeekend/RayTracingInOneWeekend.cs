@@ -8,6 +8,7 @@ public enum Scene
 {
     RandomSphereScene,
     TwoSphereScene,
+    TwoPerlinNoiseSphereScene,
 }
 
 
@@ -164,11 +165,24 @@ public class RayTracingInOneWeekend : MonoBehaviour
     {
         var listObj = new HittableList();
 
-        var texChecker = new CheckerTexture(new Color(0.2f, 0.3f, 0.1f), new Color(0.9f, 0.9f, 0.9f));
-        var matGround = new LambertainMaterial(texChecker);
+        var tex = new CheckerTexture(new Color(0.2f, 0.3f, 0.1f), new Color(0.9f, 0.9f, 0.9f));
+        var mat = new LambertainMaterial(tex);
 
-        listObj.Add(new Sphere(new Vector3(0f, -10f, 0f), 10f, matGround));
-        listObj.Add(new Sphere(new Vector3(0f, 10f, 0f), 10f, matGround));
+        listObj.Add(new Sphere(new Vector3(0f, -10f, 0f), 10f, mat));
+        listObj.Add(new Sphere(new Vector3(0f, 10f, 0f), 10f, mat));
+
+        return listObj;
+    }
+
+    HittableList TwoPerlinNoiseSphereScene()
+    {
+        var listObj = new HittableList();
+
+        var tex = new NoiseTexture();
+        var mat = new LambertainMaterial(tex);
+
+        listObj.Add(new Sphere(new Vector3(0f, -1000f, 0f), 1000f, mat));
+        listObj.Add(new Sphere(new Vector3(0f, 2f, 0f), 2f, mat));
 
         return listObj;
     }
@@ -193,6 +207,10 @@ public class RayTracingInOneWeekend : MonoBehaviour
 
             case Scene.TwoSphereScene:
                 listSceneObj = TwoSphereScene();
+                break;
+
+            case Scene.TwoPerlinNoiseSphereScene:
+                listSceneObj = TwoPerlinNoiseSphereScene();
                 break;
         }
 
