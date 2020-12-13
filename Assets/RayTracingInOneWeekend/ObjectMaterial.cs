@@ -33,6 +33,12 @@ abstract public class ObjectMaterial
 
     abstract public bool Scatter(Ray inRay, HitRecord hitRecord, out Color attenuation, out Ray scatteredrRay);
 
+
+    virtual public Color Emitted(Vector2 uv, Vector3 p)
+    {
+        return Color.black;
+    }
+
 }
 
 
@@ -40,6 +46,15 @@ abstract public class ObjectMaterial
 public class LambertainMaterial : ObjectMaterial
 {
     protected ObjectTexture albedo;
+
+
+
+    public LambertainMaterial(ObjectTexture t)
+    {
+        this.albedo = t;
+    }
+
+    public LambertainMaterial(Color albedo) : this(new SolidColor(albedo)) { }
 
 
     override public bool Scatter(Ray inRay, HitRecord hitRecord, out Color attenuation, out Ray scatteredrRay)
@@ -57,14 +72,6 @@ public class LambertainMaterial : ObjectMaterial
         return true;
     }
 
-
-    public LambertainMaterial(ObjectTexture t)
-    {
-        this.albedo = t;
-    }
-
-    public LambertainMaterial(Color albedo) : this(new SolidColor(albedo)) { }
-
 }
 
 
@@ -72,6 +79,13 @@ public class LambertainMaterial : ObjectMaterial
 public class MetalMaterial : ObjectMaterial
 {
     protected Color albedo;
+
+
+
+    public MetalMaterial(Color albedo)
+    {
+        this.albedo = albedo;
+    }
 
 
     public override bool Scatter(Ray inRay, HitRecord hitRecord, out Color attenuation, out Ray scatteredrRay)
@@ -82,17 +96,18 @@ public class MetalMaterial : ObjectMaterial
         return (Vector3.Dot(scatteredrRay.direction, hitRecord.normal) > 0f);
     }
 
-
-    public MetalMaterial(Color albedo)
-    {
-        this.albedo = albedo;
-    }
-
 }
+
 
 public class FuzzyMetalMaterial : MetalMaterial
 {
     protected float fuzz;
+
+
+    public FuzzyMetalMaterial(Color albedo, float fuzz = 0.7f) : base(albedo)
+    {
+        this.fuzz = (fuzz < 1f) ? fuzz : 1f;
+    }
 
 
     public override bool Scatter(Ray inRay, HitRecord hitRecord, out Color attenuation, out Ray scatteredrRay)
@@ -101,12 +116,6 @@ public class FuzzyMetalMaterial : MetalMaterial
         scatteredrRay = new Ray(hitRecord.p, reflected + Random.insideUnitSphere * fuzz, inRay.time);
         attenuation = albedo;
         return (Vector3.Dot(scatteredrRay.direction, hitRecord.normal) > 0f);
-    }
-
-
-    public FuzzyMetalMaterial(Color albedo, float fuzz = 0.7f) : base(albedo)
-    {
-        this.fuzz = (fuzz < 1f) ? fuzz : 1f;
     }
 
 }
@@ -118,6 +127,12 @@ public class DielectricMaterial : ObjectMaterial
     /// Refractive index
     /// </summary>
     protected float indexOfRefraction;
+
+
+    public DielectricMaterial(float indexOfRefraction = 1.5f)
+    {
+        this.indexOfRefraction = indexOfRefraction;
+    }
 
 
     public override bool Scatter(Ray inRay, HitRecord hitRecord, out Color attenuation, out Ray scatteredrRay)
@@ -151,7 +166,7 @@ public class DielectricMaterial : ObjectMaterial
     /// <summary>
     /// Schlick's approximation for reflectance.
     /// </summary>
-    float Reflectance(float cosine, float ref_idx)
+    private float Reflectance(float cosine, float ref_idx)
     {
         float r0 = (1f - ref_idx) / (1f + ref_idx);
         r0 = r0 * r0;
@@ -159,10 +174,33 @@ public class DielectricMaterial : ObjectMaterial
     }
 
 
-    public DielectricMaterial(float indexOfRefraction = 1.5f)
+}
+
+
+public class DiffuseLight : ObjectMaterial
+{
+    protected ObjectTexture emit;
+
+
+    public DiffuseLight(Color c)
     {
-        this.indexOfRefraction = indexOfRefraction;
+        emit = new SolidColor(c);
+    }
+
+
+    public override bool Scatter(Ray inRay, HitRecord hitRecord, out Color attenuation, out Ray scatteredrRay)
+    {
+        attenuation = Color.black;
+        scatteredrRay = null;
+
+        return false;
+    }
+
+    public override Color Emitted(Vector2 uv, Vector3 p)
+    {
+        return emit.Value(uv, p);
     }
 
 }
+
 

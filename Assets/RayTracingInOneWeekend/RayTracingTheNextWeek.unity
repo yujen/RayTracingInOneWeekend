@@ -343,8 +343,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   verticalFov: 20
-  lookFrom: {x: 13, y: 2, z: 3}
-  lookAt: {x: 0, y: 0, z: 0}
+  lookFrom: {x: 26, y: 3, z: 6}
+  lookAt: {x: 0, y: 2, z: 0}
   vup: {x: 0, y: 1, z: 0}
   focusDistance: 10
   aperture: 0.1
@@ -370,9 +370,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 234fec3ea45640242b041f24b34804b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scene: 3
+  scene: 4
+  backgroundColor: {r: 0, g: 0, b: 0, a: 1}
   textureWidthHeight: {x: 320, y: 180}
-  samplesPerPixel: 4
-  maxDepth: 4
-  imageTexture: {fileID: 2800000, guid: aa004fe67c4896f4c8a3ae9da26f24b5, type: 3}
+  samplesPerPixel: 50
+  maxDepth: 50
   textureResult: {fileID: 0}

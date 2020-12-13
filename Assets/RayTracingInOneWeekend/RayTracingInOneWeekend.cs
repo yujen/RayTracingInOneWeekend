@@ -10,6 +10,7 @@ public enum Scene
     TwoSphereScene,
     TwoPerlinNoiseSphereScene,
     EarthScene,
+    SimpleLightScene,
 }
 
 
@@ -18,16 +19,19 @@ public class RayTracingInOneWeekend : MonoBehaviour
     [Header("RayTracing Parameters")]
 
     [SerializeField]
-    Scene scene;
+    private Scene scene;
 
     [SerializeField]
-    Vector2Int textureWidthHeight = new Vector2Int(320, 180);
+    private Color backgroundColor = new Color(0.7f, 0.8f, 1f, 1f);
+
+    [SerializeField]
+    private Vector2Int textureWidthHeight = new Vector2Int(320, 180);
 
     [SerializeField, Range(1, 500)]
-    int samplesPerPixel = 8;
+    private int samplesPerPixel = 8;
 
     [SerializeField, Range(1, 50)]
-    int maxDepth = 8;
+    private int maxDepth = 8;
 
     [SerializeField]
     private Texture2D textureResult;
@@ -46,7 +50,7 @@ public class RayTracingInOneWeekend : MonoBehaviour
 
         HitRecord hitRecord = null;
         // t_min=0.0001f to fix shadow acne
-        if (world.IsHit(ray, 0.0001f, float.MaxValue, ref hitRecord))
+        if (world.IsHit(ray, 0.0001f, float.PositiveInfinity, ref hitRecord))
         {
             Color attenuation;
             Ray scattered;
@@ -65,6 +69,40 @@ public class RayTracingInOneWeekend : MonoBehaviour
         var unitDirection = ray.direction.normalized;
         float offset = (unitDirection.y + 1f) * 0.5f;
         return (1f - offset) * Color.white + offset * new Color(0.5f, 0.7f, 1f);
+    }
+
+    Color RayColor(Ray ray, Color background, Hittable world, int depth)
+    {
+        // If we've exceeded the ray bounce limit, no more light is gathered
+        if (depth <= 0)
+        {
+            return Color.black;
+        }
+
+
+        HitRecord hitRecord = null;
+
+        // If the ray hits nothing, return the background color.
+        if (world.IsHit(ray, 0.0001f, float.PositiveInfinity, ref hitRecord))
+        {
+            Color attenuation;
+            Ray scattered;
+            Color emitted = hitRecord.objMaterial.Emitted(hitRecord.uv, hitRecord.p);
+
+            if (hitRecord.objMaterial.Scatter(ray, hitRecord, out attenuation, out scattered))
+            {
+                return emitted + attenuation * RayColor(scattered, background, world, depth - 1);
+            }
+            else
+            {
+                return emitted;
+            }
+        }
+        else
+        {
+            return background;
+        }
+
     }
 
 
@@ -180,9 +218,9 @@ public class RayTracingInOneWeekend : MonoBehaviour
         var listObj = new HittableList();
 
         var mat_0 = new LambertainMaterial(new NoiseTexture(4f));
-        var mat_1 = new LambertainMaterial(new MarbleTexture(4f));
-
         listObj.Add(new Sphere(new Vector3(0f, -1000f, 0f), 1000f, mat_0));
+
+        var mat_1 = new LambertainMaterial(new MarbleTexture(4f));
         listObj.Add(new Sphere(new Vector3(0f, 2f, 0f), 2f, mat_1));
 
         return listObj;
@@ -196,6 +234,21 @@ public class RayTracingInOneWeekend : MonoBehaviour
         var mat = new LambertainMaterial(tex);
 
         listObj.Add(new Sphere(new Vector3(0f, 0f, 0f), 2f, mat));
+
+        return listObj;
+    }
+
+    HittableList SimpleLightScene()
+    {
+        var listObj = new HittableList();
+
+        var mat_0 = new LambertainMaterial(new NoiseTexture(4f));
+        listObj.Add(new Sphere(new Vector3(0f, -1000f, 0f), 1000f, mat_0));
+        listObj.Add(new Sphere(new Vector3(0f, 2f, 0f), 2f, mat_0));
+
+        var mat_1 = new DiffuseLight(new Color(4f, 4f, 4f));
+        listObj.Add(new Rectangle(3f, 5f, 1f, 3f, -2f, mat_1));
+        listObj.Add(new Sphere(new Vector3(0f, 7f, 0f), 2f, mat_1));
 
         return listObj;
     }
@@ -229,6 +282,10 @@ public class RayTracingInOneWeekend : MonoBehaviour
             case Scene.EarthScene:
                 listSceneObj = EarthScene();
                 break;
+
+            case Scene.SimpleLightScene:
+                listSceneObj = SimpleLightScene();
+                break;
         }
 
         // camera
@@ -252,7 +309,8 @@ public class RayTracingInOneWeekend : MonoBehaviour
                     float v = ((float)y + GetRandomNum()) / (textureHeight - 1);
 
                     var ray = cam.GetRay(u, v);
-                    pixelColor += RayColor(ray, listSceneObj, maxDepth);
+                    //pixelColor += RayColor(ray, listSceneObj, maxDepth);
+                    pixelColor += RayColor(ray, backgroundColor, listSceneObj, maxDepth);
                 }
                 WriteColor(textureResult, x, y, pixelColor, samplesPerPixel);
             }
