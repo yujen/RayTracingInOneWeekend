@@ -6,6 +6,31 @@ using UnityEngine;
 
 
 
+
+public class HitRecord
+{
+    public Vector3 p;
+    public Vector3 normal;
+    public float t;
+    public ObjectMaterial objMaterial;
+    public bool frontFace;
+
+    /// <summary>
+    /// ObjectTexture's UV
+    /// </summary>
+    public Vector2 uv;
+
+
+
+    public void SetFaceNormal(Ray ray, Vector3 outwardNormal)
+    {
+        frontFace = Vector3.Dot(ray.direction, outwardNormal) < 0f;
+        normal = frontFace ? outwardNormal : -outwardNormal;
+    }
+
+}
+
+
 public abstract class Hittable
 {
     abstract public bool IsHit(Ray ray, float t_min, float t_max, ref HitRecord hitRecord);
@@ -29,30 +54,6 @@ public abstract class Hittable
 
 }
 
-
-public class HitRecord
-{
-    public Vector3 p;
-    public Vector3 normal;
-    public float t;
-    public ObjectMaterial objMaterial;
-    public bool frontFace;
-
-    /// <summary>
-    /// ObjectTexture's UV
-    /// </summary>
-    public Vector2 uv;
-
-
-
-    public void SetFaceNormal(Ray ray, Vector3 outwardNormal)
-    {
-        frontFace = Vector3.Dot(ray.direction, outwardNormal) < 0f;
-        normal = frontFace ? outwardNormal : -outwardNormal;
-    }
-
-
-}
 
 public class HittableList : Hittable
 {

@@ -204,3 +204,28 @@ public class DiffuseLight : ObjectMaterial
 }
 
 
+public class Isotropic : ObjectMaterial
+{
+    protected ObjectTexture albedo;
+
+
+
+    public Isotropic(ObjectTexture t)
+    {
+        albedo = t;
+    }
+
+    public Isotropic(Color c) : this(new SolidColor(c)) { }
+
+
+
+    public override bool Scatter(Ray inRay, HitRecord hitRecord, out Color attenuation, out Ray scatteredrRay)
+    {
+        attenuation = albedo.Value(hitRecord.uv, hitRecord.p);
+        scatteredrRay = new Ray(hitRecord.p, Random.insideUnitSphere, inRay.time);
+
+        return true;
+    }
+}
+
+

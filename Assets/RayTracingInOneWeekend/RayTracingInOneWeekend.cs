@@ -344,8 +344,8 @@ public class RayTracingInOneWeekend : MonoBehaviour
         // image
         int textureWidth = textureWidthHeight.x;
         int textureHeight = textureWidthHeight.y;
-        textureResult = new Texture2D(textureWidth, textureHeight, TextureFormat.RGBA32, true, true);
-
+        //textureResult = new Texture2D(textureWidth, textureHeight, TextureFormat.RGBA32, true, true);
+        textureResult = new Texture2D(textureWidth, textureHeight, TextureFormat.RGBA32, true, false);
 
         float startTime = Time.realtimeSinceStartup;
 
