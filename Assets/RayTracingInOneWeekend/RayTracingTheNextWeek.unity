@@ -373,6 +373,6 @@ MonoBehaviour:
   scene: 5
   backgroundColor: {r: 0, g: 0, b: 0, a: 1}
   textureWidthHeight: {x: 320, y: 180}
-  samplesPerPixel: 8
-  maxDepth: 8
+  samplesPerPixel: 100
+  maxDepth: 50
   textureResult: {fileID: 0}

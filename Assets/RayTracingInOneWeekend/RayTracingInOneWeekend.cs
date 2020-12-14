@@ -270,6 +270,9 @@ public class RayTracingInOneWeekend : MonoBehaviour
         listObj.Add(new RectangleXZ(0f, 555f, 0f, 555f, 555f, matWhite));
         listObj.Add(new RectangleXY(0f, 555f, 0f, 555f, 555f, matWhite));
 
+        listObj.Add(new Box(new Vector3(130f, 0f, 65f), new Vector3(295f, 165f, 230f), matWhite));
+        listObj.Add(new Box(new Vector3(265f, 0f, 295f), new Vector3(430f, 330f, 460f), matWhite));
+
         return listObj;
     }
 
