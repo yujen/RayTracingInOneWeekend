@@ -11,6 +11,7 @@ public enum Scene
     TwoPerlinNoiseSphereScene,
     EarthScene,
     SimpleLightScene,
+    CornellBoxScene,
 }
 
 
@@ -242,25 +243,46 @@ public class RayTracingInOneWeekend : MonoBehaviour
     {
         var listObj = new HittableList();
 
-        var mat_0 = new LambertainMaterial(new NoiseTexture(4f));
+        var mat_0 = new LambertainMaterial(new MarbleTexture(4f));
         listObj.Add(new Sphere(new Vector3(0f, -1000f, 0f), 1000f, mat_0));
         listObj.Add(new Sphere(new Vector3(0f, 2f, 0f), 2f, mat_0));
 
         var mat_1 = new DiffuseLight(new Color(4f, 4f, 4f));
-        listObj.Add(new Rectangle(3f, 5f, 1f, 3f, -2f, mat_1));
+        listObj.Add(new RectangleXY(3f, 5f, 1f, 3f, -2f, mat_1));
         listObj.Add(new Sphere(new Vector3(0f, 7f, 0f), 2f, mat_1));
+
+        return listObj;
+    }
+
+    HittableList CornellBoxScene()
+    {
+        var listObj = new HittableList();
+
+        var matRed = new LambertainMaterial(new Color(0.65f, 0.05f, 0.05f));
+        var matWhite = new LambertainMaterial(new Color(0.73f, 0.73f, 0.73f));
+        var matGreen = new LambertainMaterial(new Color(0.12f, 0.45f, 0.15f));
+        var matLight = new DiffuseLight(new Color(15f, 15f, 15f));
+
+        listObj.Add(new RectangleYZ(0f, 555f, 0f, 555f, 555f, matGreen));
+        listObj.Add(new RectangleYZ(0f, 555f, 0f, 555f, 0f, matRed));
+        listObj.Add(new RectangleXZ(213f, 343f, 227f, 332f, 554f, matLight));
+        listObj.Add(new RectangleXZ(0f, 555f, 0f, 555f, 0f, matWhite));
+        listObj.Add(new RectangleXZ(0f, 555f, 0f, 555f, 555f, matWhite));
+        listObj.Add(new RectangleXY(0f, 555f, 0f, 555f, 555f, matWhite));
 
         return listObj;
     }
 
 
 
+
+
     void Start()
     {
-        // image
-        int textureWidth = textureWidthHeight.x;
-        int textureHeight = textureWidthHeight.y;
-        textureResult = new Texture2D(textureWidth, textureHeight, TextureFormat.RGBA32, false, true);
+        // camera
+        var cam = GetComponent<RayCamera>();
+        cam = cam ? cam : new RayCamera();
+        cam.Setup(textureWidthHeight.x / textureWidthHeight.y);
 
         // scene
         HittableList listSceneObj;
@@ -284,14 +306,35 @@ public class RayTracingInOneWeekend : MonoBehaviour
                 break;
 
             case Scene.SimpleLightScene:
+                Debug.Log("SimpleLightScene uses fixed settings");
+                backgroundColor = Color.black;
+                cam.lookFrom = new Vector3();
+                cam.lookAt = new Vector3();
+                cam.verticalFov = 20f;
+                cam.Setup(textureWidthHeight.x / textureWidthHeight.y);
+
                 listSceneObj = SimpleLightScene();
+                break;
+
+            case Scene.CornellBoxScene:
+                Debug.Log("CornellBoxScene uses fixed settings");
+                backgroundColor = Color.black;
+                cam.lookFrom = new Vector3(278f, 278f, -800f);
+                cam.lookAt = new Vector3(278f, 278f, 0f);
+                cam.verticalFov = 40f;
+                textureWidthHeight = new Vector2Int(600, 600);
+
+                cam.Setup(textureWidthHeight.x / textureWidthHeight.y);
+
+                listSceneObj = CornellBoxScene();
                 break;
         }
 
-        // camera
-        var cam = GetComponent<RayCamera>();
-        cam = cam ? cam : new RayCamera();
-        cam.Setup((float)textureWidth / (float)textureHeight);
+
+        // image
+        int textureWidth = textureWidthHeight.x;
+        int textureHeight = textureWidthHeight.y;
+        textureResult = new Texture2D(textureWidth, textureHeight, TextureFormat.RGBA32, true, true);
 
 
         float startTime = Time.realtimeSinceStartup;

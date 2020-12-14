@@ -370,9 +370,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 234fec3ea45640242b041f24b34804b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scene: 4
+  scene: 5
   backgroundColor: {r: 0, g: 0, b: 0, a: 1}
   textureWidthHeight: {x: 320, y: 180}
-  samplesPerPixel: 50
-  maxDepth: 50
+  samplesPerPixel: 8
+  maxDepth: 8
   textureResult: {fileID: 0}
