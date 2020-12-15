@@ -46,8 +46,6 @@ public class ConstantMedium : Hittable
         {
             return false;
         }
-
-
         if (boundary.IsHit(r, rec1.t + 0.0001f, float.PositiveInfinity, ref rec2) == false)
         {
             return false;
@@ -60,8 +58,8 @@ public class ConstantMedium : Hittable
         }
 
 
-        if (rec1.t < t_min) rec1.t = t_min;
-        if (rec2.t > t_max) rec2.t = t_max;
+        rec1.t = (rec1.t < t_min) ? t_min : rec1.t;
+        rec2.t = (rec2.t > t_max) ? t_max : rec2.t;
 
         if (rec1.t >= rec2.t)
         {

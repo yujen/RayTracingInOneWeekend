@@ -12,6 +12,8 @@ public enum Scene
     EarthScene,
     SimpleLightScene,
     CornellBoxScene,
+    CornellSmokeBoxScene,
+    FinalScene
 }
 
 
@@ -258,11 +260,13 @@ public class RayTracingInOneWeekend : MonoBehaviour
     {
         var listObj = new HittableList();
 
+        // material
         var matRed = new LambertainMaterial(new Color(0.65f, 0.05f, 0.05f));
         var matWhite = new LambertainMaterial(new Color(0.73f, 0.73f, 0.73f));
         var matGreen = new LambertainMaterial(new Color(0.12f, 0.45f, 0.15f));
         var matLight = new DiffuseLight(new Color(15f, 15f, 15f));
 
+        // 
         listObj.Add(new RectangleYZ(0f, 555f, 0f, 555f, 555f, matGreen));
         listObj.Add(new RectangleYZ(0f, 555f, 0f, 555f, 0f, matRed));
         listObj.Add(new RectangleXZ(213f, 343f, 227f, 332f, 554f, matLight));
@@ -270,21 +274,62 @@ public class RayTracingInOneWeekend : MonoBehaviour
         listObj.Add(new RectangleXZ(0f, 555f, 0f, 555f, 555f, matWhite));
         listObj.Add(new RectangleXY(0f, 555f, 0f, 555f, 555f, matWhite));
 
-        Hittable box_0 = new Box(new Vector3(0f, 0f, 0f), new Vector3(165f, 330f, 165f), matWhite);
+        //
+        Hittable box_0 = new Box(Vector3.zero, new Vector3(165f, 330f, 165f), matWhite);
         box_0 = new RotateY(box_0, 15f);
         box_0 = new Translate(box_0, new Vector3(265f, 0f, 295f));
         listObj.Add(box_0);
 
-        Hittable box_1 = new Box(new Vector3(0f, 0f, 0f), new Vector3(165f, 165f, 165f), matWhite);
+        Hittable box_1 = new Box(Vector3.zero, new Vector3(165f, 165f, 165f), matWhite);
         box_1 = new RotateY(box_1, -18f);
         box_1 = new Translate(box_1, new Vector3(130f, 0f, 65f));
         listObj.Add(box_1);
 
+
         return listObj;
     }
 
+    HittableList CornellSmokeBoxScene()
+    {
+        var listObj = new HittableList();
+
+        // material
+        var matRed = new LambertainMaterial(new Color(0.65f, 0.05f, 0.05f));
+        var matWhite = new LambertainMaterial(new Color(0.73f, 0.73f, 0.73f));
+        var matGreen = new LambertainMaterial(new Color(0.12f, 0.45f, 0.15f));
+        var matLight = new DiffuseLight(new Color(15f, 15f, 15f));
+
+        // 
+        listObj.Add(new RectangleYZ(0f, 555f, 0f, 555f, 555f, matGreen));
+        listObj.Add(new RectangleYZ(0f, 555f, 0f, 555f, 0f, matRed));
+        listObj.Add(new RectangleXZ(113f, 443f, 127f, 432f, 554f, matLight));
+        listObj.Add(new RectangleXZ(0f, 555f, 0f, 555f, 0f, matWhite));
+        listObj.Add(new RectangleXZ(0f, 555f, 0f, 555f, 555f, matWhite));
+        listObj.Add(new RectangleXY(0f, 555f, 0f, 555f, 555f, matWhite));
+
+        //
+        Hittable box_0 = new Box(Vector3.zero, new Vector3(165f, 330f, 165f), matWhite);
+        box_0 = new RotateY(box_0, 15f);
+        box_0 = new Translate(box_0, new Vector3(265f, 0f, 295f));
+        box_0 = new ConstantMedium(box_0, 0.01f, Color.black);
+        listObj.Add(box_0);
+
+        Hittable box_1 = new Box(Vector3.zero, new Vector3(165f, 165f, 165f), matWhite);
+        box_1 = new RotateY(box_1, -18f);
+        box_1 = new Translate(box_1, new Vector3(130f, 0f, 65f));
+        box_1 = new ConstantMedium(box_1, 0.01f, Color.white);
+        listObj.Add(box_1);
 
 
+        return listObj;
+    }
+
+    HittableList FinalScene()
+    {
+        var listObj = new HittableList();
+
+        return listObj;
+    }
 
 
     void Start()
@@ -333,10 +378,33 @@ public class RayTracingInOneWeekend : MonoBehaviour
                 cam.lookAt = new Vector3(278f, 278f, 0f);
                 cam.verticalFov = 40f;
                 textureWidthHeight = new Vector2Int(600, 600);
-
                 cam.Setup(textureWidthHeight);
 
                 listSceneObj = CornellBoxScene();
+                break;
+
+            case Scene.CornellSmokeBoxScene:
+                Debug.Log("CornellSmokeBoxScene uses fixed settings");
+                backgroundColor = Color.black;
+                cam.lookFrom = new Vector3(278f, 278f, -800f);
+                cam.lookAt = new Vector3(278f, 278f, 0f);
+                cam.verticalFov = 40f;
+                textureWidthHeight = new Vector2Int(600, 600);
+                cam.Setup(textureWidthHeight);
+
+                listSceneObj = CornellSmokeBoxScene();
+                break;
+
+            case Scene.FinalScene:
+                Debug.Log("FinalScene uses fixed settings");
+                backgroundColor = Color.black;
+                cam.lookFrom = new Vector3(478f, 278f, -600f);
+                cam.lookAt = new Vector3(278f, 278f, 0f);
+                cam.verticalFov = 40f;
+                textureWidthHeight = new Vector2Int(800, 800);
+                cam.Setup(textureWidthHeight);
+
+                listSceneObj = FinalScene();
                 break;
         }
 
