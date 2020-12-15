@@ -30,10 +30,10 @@ public class RayTracingInOneWeekend : MonoBehaviour
     [SerializeField]
     private Vector2Int textureWidthHeight = new Vector2Int(320, 180);
 
-    [SerializeField, Range(1, 500)]
+    [SerializeField, Range(1, 10000)]
     private int samplesPerPixel = 8;
 
-    [SerializeField, Range(1, 50)]
+    [SerializeField, Range(1, 100)]
     private int maxDepth = 8;
 
     [SerializeField]
@@ -474,7 +474,7 @@ public class RayTracingInOneWeekend : MonoBehaviour
                 cam.lookFrom = new Vector3(478f, 278f, -600f);
                 cam.lookAt = new Vector3(278f, 278f, 0f);
                 cam.verticalFov = 40f;
-                //textureWidthHeight = new Vector2Int(800, 800);
+                textureWidthHeight = new Vector2Int(800, 800);
                 cam.Setup(textureWidthHeight);
 
                 listSceneObj = FinalScene();
