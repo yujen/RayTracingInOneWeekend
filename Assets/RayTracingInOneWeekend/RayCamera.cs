@@ -39,6 +39,7 @@ public class RayCamera : MonoBehaviour
 
     [Header("Debug Value")]
 
+    public float aspectRatio;
     public float viewportWidth;
     public float viewportHeight;
     public Vector3 horizontal;
@@ -52,8 +53,9 @@ public class RayCamera : MonoBehaviour
 
 
 
-    public void Setup(float aspectRatio)
+    public void Setup(Vector2 textureWidthHeight)
     {
+        aspectRatio = (textureWidthHeight.x / textureWidthHeight.y);
         float theta = verticalFov * Mathf.Deg2Rad;
         float h = Mathf.Tan(theta / 2f);
         viewportHeight = 2f * h;

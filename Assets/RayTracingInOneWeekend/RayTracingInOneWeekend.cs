@@ -292,7 +292,7 @@ public class RayTracingInOneWeekend : MonoBehaviour
         // camera
         var cam = GetComponent<RayCamera>();
         cam = cam ? cam : new RayCamera();
-        cam.Setup(textureWidthHeight.x / textureWidthHeight.y);
+        cam.Setup(textureWidthHeight);
 
         // scene
         HittableList listSceneObj;
@@ -321,7 +321,7 @@ public class RayTracingInOneWeekend : MonoBehaviour
                 cam.lookFrom = new Vector3();
                 cam.lookAt = new Vector3();
                 cam.verticalFov = 20f;
-                cam.Setup(textureWidthHeight.x / textureWidthHeight.y);
+                cam.Setup(textureWidthHeight);
 
                 listSceneObj = SimpleLightScene();
                 break;
@@ -334,7 +334,7 @@ public class RayTracingInOneWeekend : MonoBehaviour
                 cam.verticalFov = 40f;
                 textureWidthHeight = new Vector2Int(600, 600);
 
-                cam.Setup(textureWidthHeight.x / textureWidthHeight.y);
+                cam.Setup(textureWidthHeight);
 
                 listSceneObj = CornellBoxScene();
                 break;
