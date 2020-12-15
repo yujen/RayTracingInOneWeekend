@@ -27,7 +27,7 @@ public class Sphere : Hittable
         float c = oc.sqrMagnitude - radius * radius;
         float discriminant = half_b * half_b - a * c;
 
-        if (discriminant < 0)
+        if (discriminant < 0f)
         {
             return false;
         }
