@@ -40,12 +40,13 @@ public class ConstantMedium : Hittable
 
 
         //
-        HitRecord rec1 = null, rec2 = null;
-
+        HitRecord rec1 = new HitRecord();
         if (boundary.IsHit(r, float.NegativeInfinity, float.PositiveInfinity, ref rec1) == false)
         {
             return false;
         }
+
+        HitRecord rec2 = new HitRecord();
         if (boundary.IsHit(r, rec1.t + 0.0001f, float.PositiveInfinity, ref rec2) == false)
         {
             return false;

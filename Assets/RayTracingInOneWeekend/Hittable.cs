@@ -57,7 +57,7 @@ public abstract class Hittable
 
 public class HittableList : Hittable
 {
-    protected List<Hittable> listHittable = new List<Hittable>();
+    public List<Hittable> listHittable = new List<Hittable>();
 
 
     public void Add(Hittable hittable)
@@ -125,8 +125,6 @@ public class BVHNode : Hittable
     protected AABB box;
 
 
-
-
     public BVHNode(List<Hittable> listHittable, int start, int end, float time0, float time1)
     {
         int axis = UnityEngine.Random.Range(0, 3);  // 0=x, 1=y, 2=z
@@ -176,12 +174,8 @@ public class BVHNode : Hittable
 
     }
 
-    /*
     public BVHNode(HittableList list, float time0, float time1)
-    {
-        BVHNode(list.listHittable, 0, list.listHittable.Count, time0, time1);
-    }
-    */
+        : this(list.listHittable, 0, list.listHittable.Count, time0, time1) { }
 
 
 
@@ -256,7 +250,7 @@ public class Translate : Hittable
             return false;
         }
 
-        output = new AABB(output.min+ offset, output.max + offset);
+        output = new AABB(output.min + offset, output.max + offset);
 
         return true;
     }
@@ -344,13 +338,13 @@ public class RotateY : Hittable
         direction[0] = cos_theta * r.direction[0] - sin_theta * r.direction[2];
         direction[2] = sin_theta * r.direction[0] + cos_theta * r.direction[2];
 
-        Ray rotatedRay = new Ray (origin, direction, r.time);
+        Ray rotatedRay = new Ray(origin, direction, r.time);
 
         if (hittable.IsHit(rotatedRay, t_min, t_max, ref hitRecord) == false)
         {
             return false;
         }
-            
+
 
         var p = hitRecord.p;
         var normal = hitRecord.normal;

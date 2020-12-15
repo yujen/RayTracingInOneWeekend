@@ -328,12 +328,85 @@ public class RayTracingInOneWeekend : MonoBehaviour
     {
         var listObj = new HittableList();
 
+        // ground
+        var listGround = new HittableList();
+        var matGround = new LambertainMaterial(new Color(0.48f, 0.83f, 0.53f));
+        for (int i = 0; i < 20; i++)
+        {
+            for (int j = 0; j < 20; j++)
+            {
+                float w = 100f;
+                float x0 = -1000f + i * w;
+                float z0 = -1000f + j * w;
+                float y0 = 0f;
+                float x1 = x0 + w;
+                float y1 = Random.Range(1f, 101f);
+                float z1 = z0 + w;
+
+                listGround.Add(new Box(new Vector3(x0, y0, z0), new Vector3(x1, y1, z1), matGround));
+            }
+        }
+        listObj.Add(new BVHNode(listGround, 0f, 1f));
+
+        // light
+        var matLight = new DiffuseLight(new Color(7f, 7f, 7f));
+        listObj.Add(new RectangleXZ(123f, 423f, 147f, 412f, 554f, matLight));
+
+        // moving sphere
+        var center1 = new Vector3(400f, 400f, 200f);
+        var center2 = center1 + new Vector3(30f, 0f, 0f);
+        var matMovingSphere = new LambertainMaterial(new Color(0.7f, 0.3f, 0.1f));
+        listObj.Add(new MovingSphere(center1, center2, 0f, 1f, 50f, matMovingSphere));
+
+        // dielectric sphere
+        listObj.Add(new Sphere(new Vector3(260f, 150f, 45f), 50f, new DielectricMaterial(1.5f)));
+
+        // metal sphere
+        var matMetal = new FuzzyMetalMaterial(new Color(0.8f, 0.8f, 0.9f), 1f);
+        listObj.Add(new Sphere(new Vector3(0f, 150f, 145f), 50f, matMetal));
+
+        // blue sphere
+        var blueSphere = new Sphere(new Vector3(360, 150, 145), 70f, new DielectricMaterial(1.5f));
+        listObj.Add(blueSphere);
+        listObj.Add(new ConstantMedium(blueSphere, 0.2f, new Color(0.2f, 0.4f, 0.9f)));
+
+        // boundary, fog
+        var fog = new Sphere(Vector3.zero, 5000f, new DielectricMaterial(1.5f));
+        listObj.Add(new ConstantMedium(fog, 0.0001f, Color.white));
+
+
+        // earth sphere
+        var matEarth = new LambertainMaterial(new ImageTexture("earthmap"));
+        listObj.Add(new Sphere(new Vector3(400, 200, 400), 100, matEarth));
+
+        // noise sphere
+        var matNoise = new LambertainMaterial(new NoiseTexture(0.1f));
+        listObj.Add(new Sphere(new Vector3(220, 280, 300), 80, matNoise));
+
+        // box sphere
+        var listBoxSphere = new HittableList();
+        var matBoxSphere = new LambertainMaterial(new Color(0.73f, 0.73f, 0.73f));
+        for (int i = 0; i < 1000; i++)
+        {
+            var center = new Vector3(Random.Range(0, 165), Random.Range(0, 165), Random.Range(0, 165));
+            listBoxSphere.Add(new Sphere(center, 10f, matBoxSphere));
+        }
+        var bvhBoxSphere = new BVHNode(listBoxSphere, 0f, 1f);
+        var rotateBoxSphere = new RotateY(bvhBoxSphere, 15f);
+        var translateBoxSphere = new Translate(rotateBoxSphere, new Vector3(-100f, 270f, 395f));
+        listObj.Add(translateBoxSphere);
+
+
+        //
         return listObj;
     }
 
 
     void Start()
     {
+        float startTime = Time.realtimeSinceStartup;
+
+
         // camera
         var cam = GetComponent<RayCamera>();
         cam = cam ? cam : new RayCamera();
@@ -389,7 +462,7 @@ public class RayTracingInOneWeekend : MonoBehaviour
                 cam.lookFrom = new Vector3(278f, 278f, -800f);
                 cam.lookAt = new Vector3(278f, 278f, 0f);
                 cam.verticalFov = 40f;
-                textureWidthHeight = new Vector2Int(600, 600);
+                //textureWidthHeight = new Vector2Int(600, 600);
                 cam.Setup(textureWidthHeight);
 
                 listSceneObj = CornellSmokeBoxScene();
@@ -401,7 +474,7 @@ public class RayTracingInOneWeekend : MonoBehaviour
                 cam.lookFrom = new Vector3(478f, 278f, -600f);
                 cam.lookAt = new Vector3(278f, 278f, 0f);
                 cam.verticalFov = 40f;
-                textureWidthHeight = new Vector2Int(800, 800);
+                //textureWidthHeight = new Vector2Int(800, 800);
                 cam.Setup(textureWidthHeight);
 
                 listSceneObj = FinalScene();
@@ -415,7 +488,9 @@ public class RayTracingInOneWeekend : MonoBehaviour
         //textureResult = new Texture2D(textureWidth, textureHeight, TextureFormat.RGBA32, true, true);
         textureResult = new Texture2D(textureWidth, textureHeight, TextureFormat.RGBA32, true, false);
 
-        float startTime = Time.realtimeSinceStartup;
+        //
+        Debug.Log($"Setup scene time: {Time.realtimeSinceStartup - startTime} sec");
+        startTime = Time.realtimeSinceStartup;
 
         // render
         for (int y = 0; y < textureHeight; y++)
