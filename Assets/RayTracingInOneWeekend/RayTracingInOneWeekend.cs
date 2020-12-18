@@ -71,9 +71,9 @@ public class RayTracingInOneWeekend : MonoBehaviour
         }
 
         return emitted
-            + albedo
+            + (albedo
             * rec.objMaterial.ScatteringPDF(ray, rec, scattered)
-            * RayColor(scattered, background, world, depth - 1);
+            * RayColor(scattered, background, world, depth - 1) / pdf);
 
     }
 
