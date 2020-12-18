@@ -7,15 +7,6 @@ using UnityEngine;
 
 abstract public class ObjectMaterial
 {
-    /// <summary>
-    /// Return true if the vector is close to zero in all dimensions.
-    /// </summary>
-    public bool IsNearZero(Vector3 v)
-    {
-        float s = 0.0001f;
-        return (Mathf.Abs(v.x) < s) && (Mathf.Abs(v.y) < s) && (Mathf.Abs(v.z) < s);
-    }
-    
 
     public Vector3 Reflect(Vector3 v, Vector3 n)
     {
@@ -62,17 +53,17 @@ public class LambertainMaterial : ObjectMaterial
 
     override public bool Scatter(Ray inRay, HitRecord hitRecord, out Color attenuation, out Ray scatteredRay, out float pdf)
     {
-        var scatterDirection = hitRecord.normal + Random.onUnitSphere;
+        var scatterDirection = hitRecord.normal.RandomInHemisphere();
 
         // Catch degenerate scatter direction
-        if (IsNearZero(scatterDirection))
+        if (scatterDirection.IsNearZero())
         {
             scatterDirection = hitRecord.normal;
         }
 
         attenuation = albedo.Value(hitRecord.uv, hitRecord.p);
         scatteredRay = new Ray(hitRecord.p, scatterDirection.normalized, inRay.time);
-        pdf = Vector3.Dot(hitRecord.normal, scatteredRay.direction) / Mathf.PI;
+        pdf = 0.5f / Mathf.PI;
 
         return true;
     }

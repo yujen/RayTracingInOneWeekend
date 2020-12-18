@@ -86,7 +86,7 @@ public class RayTracingInOneWeekend : MonoBehaviour
     /// </summary>
     float GetRandomNum()
     {
-        return Random.Range(0f, 0.999999f);
+        return Random.Range(0f, 0.99999f);
     }
 
 
