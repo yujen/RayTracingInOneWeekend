@@ -31,10 +31,10 @@ abstract public class ObjectMaterial
     }
 
 
-    abstract public bool Scatter(Ray inRay, HitRecord hitRecord, out Color attenuation, out Ray scatteredrRay, out float pdf);
+    abstract public bool Scatter(Ray inRay, HitRecord hitRecord, out Color attenuation, out Ray scatteredRay, out float pdf);
 
 
-    abstract public float ScatteringPDF(Ray inRay, HitRecord hitRecord, Ray scatteredrRay);
+    abstract public float ScatteringPDF(Ray inRay, HitRecord hitRecord, Ray scatteredRay);
 
 
     virtual public Color Emitted(Vector2 uv, Vector3 p)
@@ -60,7 +60,7 @@ public class LambertainMaterial : ObjectMaterial
     public LambertainMaterial(Color albedo) : this(new SolidColor(albedo)) { }
 
 
-    override public bool Scatter(Ray inRay, HitRecord hitRecord, out Color attenuation, out Ray scatteredrRay, out float pdf)
+    override public bool Scatter(Ray inRay, HitRecord hitRecord, out Color attenuation, out Ray scatteredRay, out float pdf)
     {
         var scatterDirection = hitRecord.normal + Random.onUnitSphere;
 
@@ -71,15 +71,15 @@ public class LambertainMaterial : ObjectMaterial
         }
 
         attenuation = albedo.Value(hitRecord.uv, hitRecord.p);
-        scatteredrRay = new Ray(hitRecord.p, scatterDirection, inRay.time);
-        pdf = Vector3.Dot(hitRecord.normal, scatteredrRay.direction) / Mathf.PI;
+        scatteredRay = new Ray(hitRecord.p, scatterDirection.normalized, inRay.time);
+        pdf = Vector3.Dot(hitRecord.normal, scatteredRay.direction) / Mathf.PI;
 
         return true;
     }
 
-    public override float ScatteringPDF(Ray inRay, HitRecord hitRecord, Ray scatteredrRay)
+    public override float ScatteringPDF(Ray inRay, HitRecord hitRecord, Ray scatteredRay)
     {
-        float cosine = Vector3.Dot(hitRecord.normal, scatteredrRay.direction.normalized);
+        float cosine = Vector3.Dot(hitRecord.normal, scatteredRay.direction.normalized);
         return (cosine < 0f) ? 0f : (cosine / Mathf.PI);
     }
 
@@ -99,16 +99,16 @@ public class MetalMaterial : ObjectMaterial
     }
 
 
-    public override bool Scatter(Ray inRay, HitRecord hitRecord, out Color attenuation, out Ray scatteredrRay, out float pdf)
+    public override bool Scatter(Ray inRay, HitRecord hitRecord, out Color attenuation, out Ray scatteredRay, out float pdf)
     {
         var reflected = Reflect(inRay.direction.normalized, hitRecord.normal);
         attenuation = albedo;
-        scatteredrRay = new Ray(hitRecord.p, reflected, inRay.time);
+        scatteredRay = new Ray(hitRecord.p, reflected, inRay.time);
         pdf = 0f;
-        return (Vector3.Dot(scatteredrRay.direction, hitRecord.normal) > 0f);
+        return (Vector3.Dot(scatteredRay.direction, hitRecord.normal) > 0f);
     }
 
-    public override float ScatteringPDF(Ray inRay, HitRecord hitRecord, Ray scatteredrRay)
+    public override float ScatteringPDF(Ray inRay, HitRecord hitRecord, Ray scatteredRay)
     {
         throw new System.NotImplementedException();
     }
@@ -126,13 +126,13 @@ public class FuzzyMetalMaterial : MetalMaterial
     }
 
 
-    public override bool Scatter(Ray inRay, HitRecord hitRecord, out Color attenuation, out Ray scatteredrRay, out float pdf)
+    public override bool Scatter(Ray inRay, HitRecord hitRecord, out Color attenuation, out Ray scatteredRay, out float pdf)
     {
         var reflected = Reflect(inRay.direction.normalized, hitRecord.normal);
         attenuation = albedo;
-        scatteredrRay = new Ray(hitRecord.p, reflected + Random.insideUnitSphere * fuzz, inRay.time);
+        scatteredRay = new Ray(hitRecord.p, reflected + Random.insideUnitSphere * fuzz, inRay.time);
         pdf = 0f;
-        return (Vector3.Dot(scatteredrRay.direction, hitRecord.normal) > 0f);
+        return (Vector3.Dot(scatteredRay.direction, hitRecord.normal) > 0f);
     }
 
 }
@@ -152,7 +152,7 @@ public class DielectricMaterial : ObjectMaterial
     }
 
 
-    public override bool Scatter(Ray inRay, HitRecord hitRecord, out Color attenuation, out Ray scatteredrRay, out float pdf)
+    public override bool Scatter(Ray inRay, HitRecord hitRecord, out Color attenuation, out Ray scatteredRay, out float pdf)
     {
         attenuation = Color.white;
         pdf = 0f;
@@ -175,12 +175,12 @@ public class DielectricMaterial : ObjectMaterial
             direction = Refract(unit_direction, hitRecord.normal, refraction_ratio);
         }
 
-        scatteredrRay = new Ray(hitRecord.p, direction, inRay.time);
+        scatteredRay = new Ray(hitRecord.p, direction, inRay.time);
 
         return true;
     }
 
-    public override float ScatteringPDF(Ray inRay, HitRecord hitRecord, Ray scatteredrRay)
+    public override float ScatteringPDF(Ray inRay, HitRecord hitRecord, Ray scatteredRay)
     {
         throw new System.NotImplementedException();
     }
@@ -211,10 +211,10 @@ public class DiffuseLight : ObjectMaterial
     }
 
 
-    public override bool Scatter(Ray inRay, HitRecord hitRecord, out Color attenuation, out Ray scatteredrRay, out float pdf)
+    public override bool Scatter(Ray inRay, HitRecord hitRecord, out Color attenuation, out Ray scatteredRay, out float pdf)
     {
         attenuation = Color.black;
-        scatteredrRay = null;
+        scatteredRay = null;
         pdf = 0f;
 
         return false;
@@ -225,7 +225,7 @@ public class DiffuseLight : ObjectMaterial
         return emit.Value(uv, p);
     }
 
-    public override float ScatteringPDF(Ray inRay, HitRecord hitRecord, Ray scatteredrRay)
+    public override float ScatteringPDF(Ray inRay, HitRecord hitRecord, Ray scatteredRay)
     {
         throw new System.NotImplementedException();
     }
@@ -247,16 +247,16 @@ public class Isotropic : ObjectMaterial
 
 
 
-    public override bool Scatter(Ray inRay, HitRecord hitRecord, out Color attenuation, out Ray scatteredrRay, out float pdf)
+    public override bool Scatter(Ray inRay, HitRecord hitRecord, out Color attenuation, out Ray scatteredRay, out float pdf)
     {
         attenuation = albedo.Value(hitRecord.uv, hitRecord.p);
-        scatteredrRay = new Ray(hitRecord.p, Random.insideUnitSphere, inRay.time);
+        scatteredRay = new Ray(hitRecord.p, Random.insideUnitSphere, inRay.time);
         pdf = 0f;
 
         return true;
     }
 
-    public override float ScatteringPDF(Ray inRay, HitRecord hitRecord, Ray scatteredrRay)
+    public override float ScatteringPDF(Ray inRay, HitRecord hitRecord, Ray scatteredRay)
     {
         throw new System.NotImplementedException();
     }

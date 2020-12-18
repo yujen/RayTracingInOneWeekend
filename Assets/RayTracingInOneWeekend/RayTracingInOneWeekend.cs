@@ -62,7 +62,7 @@ public class RayTracingInOneWeekend : MonoBehaviour
 
         Color albedo;
         Ray scattered;
-        float pdf;  // 
+        float pdf;  // probability density function
         Color emitted = rec.objMaterial.Emitted(rec.uv, rec.p);
 
         if (rec.objMaterial.Scatter(ray, rec, out albedo, out scattered, out pdf) == false)
