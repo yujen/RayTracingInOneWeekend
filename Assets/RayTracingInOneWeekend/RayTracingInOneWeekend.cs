@@ -43,36 +43,6 @@ public class RayTracingInOneWeekend : MonoBehaviour
 
 
 
-    Color RayColor(Ray ray, Hittable world, int depth)
-    {
-        // If we've exceeded the ray bounce limit, no more light is gathered
-        if (depth <= 0)
-        {
-            return Color.black;
-        }
-
-        HitRecord hitRecord = null;
-        // t_min=0.0001f to fix shadow acne
-        if (world.IsHit(ray, 0.0001f, float.PositiveInfinity, ref hitRecord))
-        {
-            Color attenuation;
-            Ray scattered;
-            if (hitRecord.objMaterial.Scatter(ray, hitRecord, out attenuation, out scattered))
-            {
-                return attenuation * RayColor(scattered, world, depth - 1);
-            }
-            else
-            {
-                return Color.black;
-            }
-
-        }
-
-        // background
-        var unitDirection = ray.direction.normalized;
-        float offset = (unitDirection.y + 1f) * 0.5f;
-        return (1f - offset) * Color.white + offset * new Color(0.5f, 0.7f, 1f);
-    }
 
     Color RayColor(Ray ray, Color background, Hittable world, int depth)
     {
@@ -82,29 +52,28 @@ public class RayTracingInOneWeekend : MonoBehaviour
             return Color.black;
         }
 
-
-        HitRecord hitRecord = null;
-
         // If the ray hits nothing, return the background color.
-        if (world.IsHit(ray, 0.0001f, float.PositiveInfinity, ref hitRecord))
-        {
-            Color attenuation;
-            Ray scattered;
-            Color emitted = hitRecord.objMaterial.Emitted(hitRecord.uv, hitRecord.p);
-
-            if (hitRecord.objMaterial.Scatter(ray, hitRecord, out attenuation, out scattered))
-            {
-                return emitted + attenuation * RayColor(scattered, background, world, depth - 1);
-            }
-            else
-            {
-                return emitted;
-            }
-        }
-        else
+        HitRecord rec = null;
+        if (world.IsHit(ray, 0.0001f, float.PositiveInfinity, ref rec) == false)
         {
             return background;
         }
+
+
+        Color albedo;
+        Ray scattered;
+        float pdf;  // 
+        Color emitted = rec.objMaterial.Emitted(rec.uv, rec.p);
+
+        if (rec.objMaterial.Scatter(ray, rec, out albedo, out scattered, out pdf) == false)
+        {
+            return emitted;
+        }
+
+        return emitted
+            + albedo
+            * rec.objMaterial.ScatteringPDF(ray, rec, scattered)
+            * RayColor(scattered, background, world, depth - 1);
 
     }
 

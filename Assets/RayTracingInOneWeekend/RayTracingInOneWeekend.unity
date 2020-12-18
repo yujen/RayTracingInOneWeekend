@@ -311,9 +311,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 234fec3ea45640242b041f24b34804b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  scene: 0
+  backgroundColor: {r: 0.7, g: 0.8, b: 1, a: 1}
   textureWidthHeight: {x: 320, y: 180}
-  samplesPerPixel: 8
-  maxDepth: 8
+  samplesPerPixel: 50
+  maxDepth: 50
   textureResult: {fileID: 0}
 --- !u!114 &1651417737
 MonoBehaviour:
@@ -364,6 +366,8 @@ MonoBehaviour:
   vup: {x: 0, y: 1, z: 0}
   focusDistance: 10
   aperture: 0.1
+  shutterTime: {x: 0, y: 1}
+  aspectRatio: 0
   viewportWidth: 0
   viewportHeight: 0
   horizontal: {x: 0, y: 0, z: 0}
