@@ -464,8 +464,8 @@ public class RayTracingInOneWeekend : MonoBehaviour
 
                 for (int i = 0; i < samplesPerPixel; i++)
                 {
-                    float u = ((float)x + Utils.RandomNum()) / (textureWidth - 1);
-                    float v = ((float)y + Utils.RandomNum()) / (textureHeight - 1);
+                    float u = ((float)x + Utils.RandomNum) / (textureWidth - 1);
+                    float v = ((float)y + Utils.RandomNum) / (textureHeight - 1);
 
                     var ray = cam.GetRay(u, v);
                     //pixelColor += RayColor(ray, listSceneObj, maxDepth);

@@ -55,17 +55,13 @@ public class LambertainMaterial : ObjectMaterial
 
     override public bool Scatter(Ray inRay, HitRecord hitRecord, out Color attenuation, out Ray scatteredRay, out float pdf)
     {
-        var scatterDirection = hitRecord.normal.RandomInHemisphere();
+        var uvw = new ONB();
+        uvw.BuildFromW(hitRecord.normal);
+        var direction = uvw.Local(Utils.RandomCosineDirection);
 
-        // Catch degenerate scatter direction
-        if (scatterDirection.IsNearZero())
-        {
-            scatterDirection = hitRecord.normal;
-        }
-
+        scatteredRay = new Ray(hitRecord.p, direction.normalized, inRay.time);
         attenuation = albedo.Value(hitRecord.uv, hitRecord.p);
-        scatteredRay = new Ray(hitRecord.p, scatterDirection.normalized, inRay.time);
-        pdf = 0.5f / Mathf.PI;
+        pdf = Vector3.Dot(uvw.w, scatteredRay.direction) / Mathf.PI;
 
         return true;
     }
