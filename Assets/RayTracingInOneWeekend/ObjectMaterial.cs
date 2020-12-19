@@ -5,6 +5,15 @@ using UnityEngine;
 
 
 
+
+public class ScatterRecord
+{
+    public Ray specluarRay;
+    public bool isSpecular;
+    public Color attenuation;
+    public PDF pdf;
+}
+
 abstract public class ObjectMaterial
 {
 
@@ -22,7 +31,7 @@ abstract public class ObjectMaterial
     }
 
 
-    abstract public bool Scatter(Ray inRay, HitRecord hitRecord, out Color attenuation, out Ray scatteredRay, out float pdf);
+    abstract public bool Scatter(Ray inRay, HitRecord hitRecord, out ScatterRecord scatterRec);
 
     /// <summary>
     /// Probability Density Function for importance sampling
@@ -30,7 +39,7 @@ abstract public class ObjectMaterial
     abstract public float ScatteringPDF(Ray inRay, HitRecord hitRecord, Ray scatteredRay);
 
 
-    virtual public Color Emitted(HitRecord hitRecord)
+    virtual public Color Emitted(Ray inRay, HitRecord hitRecord)
     {
         return Color.black;
     }
@@ -53,15 +62,13 @@ public class LambertainMaterial : ObjectMaterial
     public LambertainMaterial(Color albedo) : this(new SolidColor(albedo)) { }
 
 
-    public override bool Scatter(Ray inRay, HitRecord hitRecord, out Color attenuation, out Ray scatteredRay, out float pdf)
+    public override bool Scatter(Ray inRay, HitRecord hitRecord, out ScatterRecord scatterRec)
     {
-        var uvw = new ONB();
-        uvw.BuildFromW(hitRecord.normal);
-        var direction = uvw.Local(Utils.RandomCosineDirection);
-
-        scatteredRay = new Ray(hitRecord.p, direction.normalized, inRay.time);
-        attenuation = albedo.Value(hitRecord.uv, hitRecord.p);
-        pdf = Vector3.Dot(uvw.w, scatteredRay.direction) / Mathf.PI;
+        scatterRec = new ScatterRecord();
+        //scatterRec.ray = null;
+        scatterRec.isSpecular = false;
+        scatterRec.attenuation = albedo.Value(hitRecord.uv, hitRecord.p);
+        scatterRec.pdf = new CosinePDF(hitRecord.normal);
 
         return true;
     }
@@ -88,13 +95,17 @@ public class MetalMaterial : ObjectMaterial
     }
 
 
-    public override bool Scatter(Ray inRay, HitRecord hitRecord, out Color attenuation, out Ray scatteredRay, out float pdf)
+    public override bool Scatter(Ray inRay, HitRecord hitRecord, out ScatterRecord scatterRec)
     {
         var reflected = Reflect(inRay.direction.normalized, hitRecord.normal);
-        attenuation = albedo;
-        scatteredRay = new Ray(hitRecord.p, reflected, inRay.time);
-        pdf = 0f;
-        return (Vector3.Dot(scatteredRay.direction, hitRecord.normal) > 0f);
+
+        scatterRec = new ScatterRecord();
+        scatterRec.specluarRay = new Ray(hitRecord.p, reflected, inRay.time);
+        scatterRec.isSpecular = true;
+        scatterRec.attenuation = albedo;
+        scatterRec.pdf = null;
+
+        return true;
     }
 
     public override float ScatteringPDF(Ray inRay, HitRecord hitRecord, Ray scatteredRay)
@@ -115,13 +126,17 @@ public class FuzzyMetalMaterial : MetalMaterial
     }
 
 
-    public override bool Scatter(Ray inRay, HitRecord hitRecord, out Color attenuation, out Ray scatteredRay, out float pdf)
+    public override bool Scatter(Ray inRay, HitRecord hitRecord, out ScatterRecord scatterRec)
     {
         var reflected = Reflect(inRay.direction.normalized, hitRecord.normal);
-        attenuation = albedo;
-        scatteredRay = new Ray(hitRecord.p, reflected + Random.insideUnitSphere * fuzz, inRay.time);
-        pdf = 0f;
-        return (Vector3.Dot(scatteredRay.direction, hitRecord.normal) > 0f);
+
+        scatterRec = new ScatterRecord();
+        scatterRec.specluarRay = new Ray(hitRecord.p, reflected + Random.insideUnitSphere * fuzz, inRay.time);
+        scatterRec.isSpecular = true;
+        scatterRec.attenuation = albedo;
+        scatterRec.pdf = null;
+
+        return true;
     }
 
 }
@@ -141,10 +156,12 @@ public class DielectricMaterial : ObjectMaterial
     }
 
 
-    public override bool Scatter(Ray inRay, HitRecord hitRecord, out Color attenuation, out Ray scatteredRay, out float pdf)
+    public override bool Scatter(Ray inRay, HitRecord hitRecord, out ScatterRecord scatterRec)
     {
-        attenuation = Color.white;
-        pdf = 0f;
+        scatterRec = new ScatterRecord();
+        scatterRec.isSpecular = true;
+        scatterRec.attenuation = Color.white;
+        scatterRec.pdf = null;
 
         float refraction_ratio = hitRecord.frontFace ? (1f / indexOfRefraction) : indexOfRefraction;
         Vector3 unit_direction = inRay.direction.normalized;
@@ -164,7 +181,7 @@ public class DielectricMaterial : ObjectMaterial
             direction = Refract(unit_direction, hitRecord.normal, refraction_ratio);
         }
 
-        scatteredRay = new Ray(hitRecord.p, direction, inRay.time);
+        scatterRec.specluarRay = new Ray(hitRecord.p, direction, inRay.time);
 
         return true;
     }
@@ -200,11 +217,9 @@ public class DiffuseLight : ObjectMaterial
     }
 
 
-    public override bool Scatter(Ray inRay, HitRecord hitRecord, out Color attenuation, out Ray scatteredRay, out float pdf)
+    public override bool Scatter(Ray inRay, HitRecord hitRecord, out ScatterRecord scatterRec)
     {
-        attenuation = Color.black;
-        scatteredRay = null;
-        pdf = 0f;
+        scatterRec = null;
 
         return false;
     }
@@ -213,7 +228,7 @@ public class DiffuseLight : ObjectMaterial
     {
         throw new System.NotImplementedException();
     }
-    public override Color Emitted(HitRecord hitRecord)
+    public override Color Emitted(Ray inRay, HitRecord hitRecord)
     {
         if (hitRecord.frontFace)
         {
@@ -243,11 +258,13 @@ public class Isotropic : ObjectMaterial
 
 
 
-    public override bool Scatter(Ray inRay, HitRecord hitRecord, out Color attenuation, out Ray scatteredRay, out float pdf)
+    public override bool Scatter(Ray inRay, HitRecord hitRecord, out ScatterRecord scatterRec)
     {
-        attenuation = albedo.Value(hitRecord.uv, hitRecord.p);
-        scatteredRay = new Ray(hitRecord.p, Random.insideUnitSphere, inRay.time);
-        pdf = 0f;
+        scatterRec = new ScatterRecord();
+        scatterRec.specluarRay = new Ray(hitRecord.p, Random.insideUnitSphere, inRay.time);
+        scatterRec.isSpecular = true;
+        scatterRec.attenuation = albedo.Value(hitRecord.uv, hitRecord.p);
+        scatterRec.pdf = null;
 
         return true;
     }

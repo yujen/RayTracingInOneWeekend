@@ -53,60 +53,36 @@ public class RayTracingInOneWeekend : MonoBehaviour
         }
 
         // If the ray hits nothing, return the background color.
-        HitRecord rec = null;
-        if (world.IsHit(ray, 0.001f, float.PositiveInfinity, ref rec) == false)
+        HitRecord hitRec = null;
+        if (world.IsHit(ray, 0.001f, float.PositiveInfinity, ref hitRec) == false)
         {
             return background;
         }
 
+        //
+        ScatterRecord scatterRec;
+        Color emitted = hitRec.objMaterial.Emitted(ray, hitRec);
 
-        Color albedo;
-        Ray scattered;
-        float pdf;  // probability density function
-        Color emitted = rec.objMaterial.Emitted(rec);
-
-        if (rec.objMaterial.Scatter(ray, rec, out albedo, out scattered, out pdf) == false)
+        if (hitRec.objMaterial.Scatter(ray, hitRec, out scatterRec) == false)
         {
             return emitted;
         }
-
-        var p0 = new HittablePDF(lights, rec.p);
-        var p1 = new CosinePDF(rec.normal);
-        var mixturePDF = new MixturePDF(p0, p1);
-
-        scattered = new Ray(rec.p, mixturePDF.Generate(), ray.time);
-        pdf = mixturePDF.Value(scattered.direction);
-
-        /*
-        // =======================
-        var on_light = new Vector3(Utils.RandomRange(213, 343), 554, Utils.RandomRange(227, 332));
-        var to_light = on_light - rec.p;
-        var distance_squared = to_light.sqrMagnitude;
-        to_light.Normalize();
-
-        if (Vector3.Dot(to_light, rec.normal) < 0f)
+        if (scatterRec.isSpecular)
         {
-            return emitted;
+            return scatterRec.attenuation
+                * RayColor(scatterRec.specluarRay, background, world, lights, depth - 1);
         }
-
-
-        float light_area = (343 - 213) * (332 - 227);
-        float light_cosine = Mathf.Abs(to_light.y);
-        if (light_cosine < 0.000001f)
-        {
-            return emitted;
-        }
-
-        pdf = distance_squared / (light_cosine * light_area);
-        scattered = new Ray(rec.p, to_light, ray.time);
-        // =======================
-        */
 
         //
+        var lightsPDF = new HittablePDF(lights, hitRec.p);
+        var mixturePDF = new MixturePDF(lightsPDF, scatterRec.pdf);
+        var scatteredRay = new Ray(hitRec.p, mixturePDF.Generate(), ray.time);
+        float pdf = mixturePDF.Value(scatteredRay.direction);
+
         return emitted
-            + (albedo
-            * rec.objMaterial.ScatteringPDF(ray, rec, scattered)
-            * RayColor(scattered, background, world, lights, depth - 1) / pdf);
+            + (scatterRec.attenuation
+            * hitRec.objMaterial.ScatteringPDF(ray, hitRec, scatteredRay)
+            * RayColor(scatteredRay, background, world, lights, depth - 1) / pdf);
 
     }
 
@@ -262,6 +238,8 @@ public class RayTracingInOneWeekend : MonoBehaviour
         var matWhite = new LambertainMaterial(new Color(0.73f, 0.73f, 0.73f));
         var matGreen = new LambertainMaterial(new Color(0.12f, 0.45f, 0.15f));
         var matLight = new DiffuseLight(new Color(15f, 15f, 15f));
+        var matAluminum = new FuzzyMetalMaterial(new Color(0.8f, 0.85f, 0.88f), 0f);
+        var matGlass = new DielectricMaterial(1.5f);
 
         // 
         listObj.Add(new RectangleYZ(0f, 555f, 0f, 555f, 555f, matGreen));
@@ -270,9 +248,10 @@ public class RayTracingInOneWeekend : MonoBehaviour
         listObj.Add(new RectangleXZ(0f, 555f, 0f, 555f, 0f, matWhite));
         listObj.Add(new RectangleXZ(0f, 555f, 0f, 555f, 555f, matWhite));
         listObj.Add(new RectangleXY(0f, 555f, 0f, 555f, 555f, matWhite));
+        listObj.Add(new Sphere(new Vector3(190f, 90f, 190f), 90f, matGlass));
 
         //
-        Hittable box_0 = new Box(Vector3.zero, new Vector3(165f, 330f, 165f), matWhite);
+        Hittable box_0 = new Box(Vector3.zero, new Vector3(165f, 330f, 165f), matAluminum);
         box_0 = new RotateY(box_0, 15f);
         box_0 = new Translate(box_0, new Vector3(265f, 0f, 295f));
         listObj.Add(box_0);
@@ -411,7 +390,7 @@ public class RayTracingInOneWeekend : MonoBehaviour
 
         // scene
         HittableList listSceneObj;
-        Hittable lights = null;
+        HittableList listLight = new HittableList();
         switch (scene)
         {
             case Scene.RandomSphereScene:
@@ -456,7 +435,9 @@ public class RayTracingInOneWeekend : MonoBehaviour
                 cam.Setup(textureWidthHeight);
 
                 listSceneObj = CornellBoxScene();
-                lights = new RectangleXZ(213f, 343f, 227f, 332f, 554f, null);
+
+                listLight.Add(new RectangleXZ(213f, 343f, 227f, 332f, 554f, null));
+                listLight.Add(new Sphere(new Vector3(190f, 90f, 190f), 90f, null));
                 break;
 
             case Scene.CornellSmokeBoxScene:
@@ -511,7 +492,7 @@ public class RayTracingInOneWeekend : MonoBehaviour
                     float v = ((float)y + Utils.RandomNum) / (textureHeight - 1);
 
                     var ray = cam.GetRay(u, v);
-                    pixelColor += RayColor(ray, backgroundColor, listSceneObj, lights, maxDepth);
+                    pixelColor += RayColor(ray, backgroundColor, listSceneObj, listLight, maxDepth);
                 }
                 WriteColor(textureResult, x, y, pixelColor, samplesPerPixel);
             }
