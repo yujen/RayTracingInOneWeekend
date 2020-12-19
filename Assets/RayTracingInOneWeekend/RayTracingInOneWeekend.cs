@@ -70,6 +70,32 @@ public class RayTracingInOneWeekend : MonoBehaviour
             return emitted;
         }
 
+        // =======================
+        var on_light = new Vector3(Utils.RandomRange(213, 343), 554, Utils.RandomRange(227, 332));
+        var to_light = on_light - rec.p;
+        var distance_squared = to_light.sqrMagnitude;
+        to_light.Normalize();
+
+        if (Vector3.Dot(to_light, rec.normal) < 0f)
+        {
+            return emitted;
+        }
+            
+
+        float light_area = (343 - 213) * (332 - 227);
+        float light_cosine = Mathf.Abs(to_light.y);
+        if (light_cosine < 0.000001f)
+        {
+            return emitted;
+        }
+
+        pdf = distance_squared / (light_cosine * light_area);
+        scattered = new Ray(rec.p, to_light, ray.time);
+
+        // =======================
+        
+
+        //
         return emitted
             + (albedo
             * rec.objMaterial.ScatteringPDF(ray, rec, scattered)
@@ -456,8 +482,8 @@ public class RayTracingInOneWeekend : MonoBehaviour
         // image
         int textureWidth = textureWidthHeight.x;
         int textureHeight = textureWidthHeight.y;
-        textureResult = new Texture2D(textureWidth, textureHeight, TextureFormat.RGBA32, true, true);
-        //textureResult = new Texture2D(textureWidth, textureHeight, TextureFormat.RGBA32, true, false);
+        textureResult = new Texture2D(textureWidth, textureHeight, TextureFormat.ARGB32, false, true);
+        //textureResult = new Texture2D(textureWidth, textureHeight, TextureFormat.RGBA32, false, false);
 
         //
         Debug.Log($"Setup scene time: {Time.realtimeSinceStartup - startTime} sec");
@@ -482,8 +508,31 @@ public class RayTracingInOneWeekend : MonoBehaviour
             }
         }
 
-        textureResult.Apply();
         Debug.Log($"Render time: {Time.realtimeSinceStartup - startTime} sec");
+
+
+        SaveTexture(textureResult);
+
+    }
+
+    /// <summary>
+    /// https://answers.unity.com/questions/1340371/endcodetopng-resulting-in-dark-image.html
+    /// </summary>
+    private void SaveTexture(Texture2D texture)
+    {
+        texture.Apply();
+
+        var rt = RenderTexture.GetTemporary(texture.width, texture.height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Default);
+        
+        Graphics.Blit(texture, rt);
+
+        RenderTexture.active = rt;
+        Texture2D tex = new Texture2D(rt.width, rt.height, TextureFormat.ARGB32, true, true);
+        tex.ReadPixels(new Rect(0, 0, rt.width, rt.height), 0, 0);
+        tex.Apply();
+
+        RenderTexture.active = null;
+        RenderTexture.ReleaseTemporary(rt);
 
         try
         {
@@ -492,7 +541,7 @@ public class RayTracingInOneWeekend : MonoBehaviour
 
             string pngPath = Path.Combine(dir, $"{System.DateTime.Now.Ticks}.png");
 
-            var pngData = textureResult.EncodeToPNG();
+            var pngData = tex.EncodeToPNG();
             File.WriteAllBytes(pngPath, pngData);
 
             Debug.Log($"Save to: {pngPath}");
@@ -502,7 +551,10 @@ public class RayTracingInOneWeekend : MonoBehaviour
             Debug.LogError(e);
         }
 
+        Object.Destroy(tex);
+
     }
+
 
 
 }
