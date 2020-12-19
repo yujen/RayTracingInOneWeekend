@@ -24,6 +24,26 @@ public static class Utils
     }
 
 
+    /// <summary>
+    /// Uniform Sampling a Hemisphere
+    /// </summary>
+    public static Vector3 RandomCosineDirection
+    {
+        get
+        {
+            float r1 = RandomNum;
+            float r2 = RandomNum;
+            float z = Mathf.Sqrt(1f - r2);
+
+            float phi = 2f * Mathf.PI * r1;
+            float x = Mathf.Cos(phi) * Mathf.Sqrt(r2);
+            float y = Mathf.Sin(phi) * Mathf.Sqrt(r2);
+
+            return new Vector3(x, y, z);
+        }
+    }
+
+
     public static Vector3 RandomInHemisphere(this Vector3 normal)
     {
         var insideUnitSphere = Random.insideUnitSphere;
@@ -48,21 +68,7 @@ public static class Utils
     }
 
 
-    public static Vector3 RandomCosineDirection
-    {
-        get
-        {
-            float r1 = RandomNum;
-            float r2 = RandomNum;
-            float z = Mathf.Sqrt(1f - r2);
-
-            float phi = 2f * Mathf.PI * r1;
-            float x = Mathf.Cos(phi) * Mathf.Sqrt(r2);
-            float y = Mathf.Sin(phi) * Mathf.Sqrt(r2);
-
-            return new Vector3(x, y, z);
-        }
-    }
+    
 
 
 

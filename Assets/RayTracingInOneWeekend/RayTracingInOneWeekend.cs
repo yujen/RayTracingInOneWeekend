@@ -412,8 +412,12 @@ public class RayTracingInOneWeekend : MonoBehaviour
                 backgroundColor = Color.black;
                 cam.lookFrom = new Vector3(278f, 278f, -800f);
                 cam.lookAt = new Vector3(278f, 278f, 0f);
+                cam.vup = Vector3.up;
                 cam.verticalFov = 40f;
-                textureWidthHeight = new Vector2Int(600, 600);
+                cam.focusDistance = 10f;
+                cam.aperture = 0f;
+                cam.shutterTime = new Vector2(0f, 1f);
+                //textureWidthHeight = new Vector2Int(600, 600);
                 cam.Setup(textureWidthHeight);
 
                 listSceneObj = CornellBoxScene();
