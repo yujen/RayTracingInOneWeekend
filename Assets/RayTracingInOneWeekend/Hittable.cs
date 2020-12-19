@@ -128,6 +128,24 @@ public class HittableList : Hittable
         return true;
     }
 
+    public override float ValuePDF(Vector3 origin, Vector3 v)
+    {
+        float weight = 1f / listHittable.Count;
+        float sum = 0f;
+
+        foreach (var hittable in listHittable)
+        {
+            sum += weight * hittable.ValuePDF(origin, v);
+        }
+
+        return sum;
+    }
+
+    public override Vector3 RandomPDF(Vector3 origin)
+    {
+        return listHittable[UnityEngine.Random.Range(0, listHittable.Count)].RandomPDF(origin);
+    }
+
 }
 
 

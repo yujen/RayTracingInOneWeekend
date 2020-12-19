@@ -63,6 +63,29 @@ public class Sphere : Hittable
         return true;
     }
 
+    public override float ValuePDF(Vector3 origin, Vector3 v)
+    {
+        HitRecord hitRec = new HitRecord();
+        if (IsHit(new Ray(origin, v), 0.001f, float.PositiveInfinity, ref hitRec) == false)
+        {
+            return 0f;
+        }
+
+        float cos_theta_max = Mathf.Sqrt(1f - radius * radius / (center - origin).sqrMagnitude);
+        float solid_angle = 2 * Mathf.PI * (1f - cos_theta_max);
+
+        return 1f / solid_angle;
+    }
+
+    public override Vector3 RandomPDF(Vector3 origin)
+    {
+        var direction = center - origin;
+        float distance_squared = direction.sqrMagnitude;
+        ONB uvw = new ONB();
+        uvw.BuildFromW(direction);
+        return uvw.Local(Utils.RandomSphere(radius, distance_squared));
+    }
+
 
     /// <summary>
     /// Texture coordinates for sphere

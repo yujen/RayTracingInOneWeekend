@@ -43,6 +43,19 @@ public static class Utils
         }
     }
 
+    public static Vector3 RandomSphere(float radius, float distance_squared)
+    {
+        float r1 = RandomNum;
+        float r2 = RandomNum;
+        float z = 1f + r2 * (Mathf.Sqrt(1f - radius * radius / distance_squared) - 1f);
+
+        float phi = 2f * Mathf.PI * r1;
+        float x = Mathf.Cos(phi) * Mathf.Sqrt(1f - z * z);
+        float y = Mathf.Sin(phi) * Mathf.Sqrt(1f - z * z);
+
+        return new Vector3(x, y, z);
+    }
+
 
     public static Vector3 RandomInHemisphere(this Vector3 normal)
     {
@@ -68,7 +81,7 @@ public static class Utils
     }
 
 
-    
+
 
 
 

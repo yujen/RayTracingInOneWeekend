@@ -233,34 +233,34 @@ public class RayTracingInOneWeekend : MonoBehaviour
     {
         var listObj = new HittableList();
 
-        // material
+        //
         var matRed = new LambertainMaterial(new Color(0.65f, 0.05f, 0.05f));
         var matWhite = new LambertainMaterial(new Color(0.73f, 0.73f, 0.73f));
         var matGreen = new LambertainMaterial(new Color(0.12f, 0.45f, 0.15f));
         var matLight = new DiffuseLight(new Color(15f, 15f, 15f));
-        var matAluminum = new FuzzyMetalMaterial(new Color(0.8f, 0.85f, 0.88f), 0f);
-        var matGlass = new DielectricMaterial(1.5f);
 
-        // 
         listObj.Add(new RectangleYZ(0f, 555f, 0f, 555f, 555f, matGreen));
         listObj.Add(new RectangleYZ(0f, 555f, 0f, 555f, 0f, matRed));
         listObj.Add(new FlipFace(new RectangleXZ(213f, 343f, 227f, 332f, 554f, matLight)));
         listObj.Add(new RectangleXZ(0f, 555f, 0f, 555f, 0f, matWhite));
         listObj.Add(new RectangleXZ(0f, 555f, 0f, 555f, 555f, matWhite));
         listObj.Add(new RectangleXY(0f, 555f, 0f, 555f, 555f, matWhite));
-        listObj.Add(new Sphere(new Vector3(190f, 90f, 190f), 90f, matGlass));
+
 
         //
+        var matAluminum = new FuzzyMetalMaterial(new Color(0.8f, 0.85f, 0.88f), 0f);
         Hittable box_0 = new Box(Vector3.zero, new Vector3(165f, 330f, 165f), matAluminum);
         box_0 = new RotateY(box_0, 15f);
         box_0 = new Translate(box_0, new Vector3(265f, 0f, 295f));
         listObj.Add(box_0);
-
+        /*
         Hittable box_1 = new Box(Vector3.zero, new Vector3(165f, 165f, 165f), matWhite);
         box_1 = new RotateY(box_1, -18f);
         box_1 = new Translate(box_1, new Vector3(130f, 0f, 65f));
         listObj.Add(box_1);
-
+        */
+        var matGlass = new DielectricMaterial(1.5f);
+        listObj.Add(new Sphere(new Vector3(190f, 90f, 190f), 90f, matGlass));
 
         return listObj;
     }
@@ -390,7 +390,7 @@ public class RayTracingInOneWeekend : MonoBehaviour
 
         // scene
         HittableList listSceneObj;
-        Hittable listLight = null;
+        HittableList listLight = new HittableList();
         switch (scene)
         {
             case Scene.RandomSphereScene:
@@ -436,8 +436,8 @@ public class RayTracingInOneWeekend : MonoBehaviour
 
                 listSceneObj = CornellBoxScene();
 
-                listLight = (new RectangleXZ(213f, 343f, 227f, 332f, 554f, null));
-                //listLight.Add(new Sphere(new Vector3(190f, 90f, 190f), 90f, null));
+                listLight.Add(new RectangleXZ(213f, 343f, 227f, 332f, 554f, null));
+                listLight.Add(new Sphere(new Vector3(190f, 90f, 190f), 90f, null));
                 break;
 
             case Scene.CornellSmokeBoxScene:
