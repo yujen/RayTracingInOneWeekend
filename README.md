@@ -2,7 +2,7 @@
 
 [Ray Tracing in One Weekend](https://github.com/RayTracing) Unity implementation
 
-## Book 1: Random sphere Scene
+## Book 1: Random Sphere Scene
 ![Alt text](/output_images/final_1.png "final_1.png")
 
 ## Book 3: Cornell Box Scene
