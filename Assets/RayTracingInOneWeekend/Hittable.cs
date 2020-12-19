@@ -52,6 +52,18 @@ abstract public class Hittable
         return new AABB(small, big);
     }
 
+
+    virtual public float ValuePDF(Vector3 origin, Vector3 v)
+    {
+        return 0f;
+    }
+
+    virtual public Vector3 RandomPDF(Vector3 origin)
+    {
+        return new Vector3(1f, 0f, 0f);
+    }
+
+
 }
 
 

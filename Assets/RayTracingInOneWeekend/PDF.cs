@@ -43,3 +43,30 @@ public class CosinePDF : PDF
         return (cosine <= 0f) ? 0f : cosine / Mathf.PI;
     }
 }
+
+
+public class HittablePDF : PDF
+{
+    protected Hittable hittable;
+    protected Vector3 origin;
+
+
+
+    public HittablePDF(Hittable hittable, Vector3 origin)
+    {
+        this.hittable = hittable;
+        this.origin = origin;
+    }
+
+
+    public override Vector3 Generate()
+    {
+        return hittable.RandomPDF(origin);
+    }
+
+    public override float Value(Vector3 direction)
+    {
+        return hittable.ValuePDF(origin, direction);
+    }
+}
+

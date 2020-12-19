@@ -44,7 +44,7 @@ public class RayTracingInOneWeekend : MonoBehaviour
 
 
 
-    Color RayColor(Ray ray, Color background, Hittable world, int depth)
+    Color RayColor(Ray ray, Color background, Hittable world, Hittable lights, int depth)
     {
         // If we've exceeded the ray bounce limit, no more light is gathered
         if (depth <= 0)
@@ -71,10 +71,9 @@ public class RayTracingInOneWeekend : MonoBehaviour
         }
 
 
-        var cosinePDF = new CosinePDF(rec.normal);
-        scattered = new Ray(rec.p, cosinePDF.Generate(), ray.time);
-        pdf = cosinePDF.Value(scattered.direction);
-
+        var lightsPDF = new HittablePDF(lights, rec.p);
+        scattered = new Ray(rec.p, lightsPDF.Generate(), ray.time);
+        pdf = lightsPDF.Value(scattered.direction);
 
         /*
         // =======================
@@ -105,7 +104,7 @@ public class RayTracingInOneWeekend : MonoBehaviour
         return emitted
             + (albedo
             * rec.objMaterial.ScatteringPDF(ray, rec, scattered)
-            * RayColor(scattered, background, world, depth - 1) / pdf);
+            * RayColor(scattered, background, world, lights, depth - 1) / pdf);
 
     }
 
@@ -121,6 +120,7 @@ public class RayTracingInOneWeekend : MonoBehaviour
         // Divide the color by the number of samples.
         float scale = 1f / (float)samplesPerPixel;
         pixelColor *= scale;
+        pixelColor = new Color(pixelColor.r, pixelColor.g, pixelColor.b, 1f);
 
         /*
         // gamma-correct for gamma=2.0
@@ -409,6 +409,7 @@ public class RayTracingInOneWeekend : MonoBehaviour
 
         // scene
         HittableList listSceneObj;
+        Hittable lights = null;
         switch (scene)
         {
             case Scene.RandomSphereScene:
@@ -453,6 +454,7 @@ public class RayTracingInOneWeekend : MonoBehaviour
                 cam.Setup(textureWidthHeight);
 
                 listSceneObj = CornellBoxScene();
+                lights = new RectangleXZ(213f, 343f, 227f, 332f, 554f, null);
                 break;
 
             case Scene.CornellSmokeBoxScene:
@@ -499,7 +501,7 @@ public class RayTracingInOneWeekend : MonoBehaviour
         {
             for (int x = 0; x < textureWidth; x++)
             {
-                Color pixelColor = new Color(0f, 0f, 0f, 0f);
+                Color pixelColor = Color.black;
 
                 for (int i = 0; i < samplesPerPixel; i++)
                 {
@@ -507,7 +509,7 @@ public class RayTracingInOneWeekend : MonoBehaviour
                     float v = ((float)y + Utils.RandomNum) / (textureHeight - 1);
 
                     var ray = cam.GetRay(u, v);
-                    pixelColor += RayColor(ray, backgroundColor, listSceneObj, maxDepth);
+                    pixelColor += RayColor(ray, backgroundColor, listSceneObj, lights, maxDepth);
                 }
                 WriteColor(textureResult, x, y, pixelColor, samplesPerPixel);
             }

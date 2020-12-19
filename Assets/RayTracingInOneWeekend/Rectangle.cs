@@ -36,14 +36,14 @@ public class RectangleXY : Hittable
         {
             return false;
         }
-            
+
         float x = ray.origin.x + t * ray.direction.x;
         float y = ray.origin.y + t * ray.direction.y;
         if (x < x0 || x > x1 || y < y0 || y > y1)
         {
             return false;
         }
-            
+
 
         hitRecord.uv = new Vector2((x - x0) / (x1 - x0), (y - y0) / (y1 - y0));
         hitRecord.t = t;
@@ -105,6 +105,28 @@ public class RectangleXZ : Hittable
 
         return true;
     }
+
+    public override float ValuePDF(Vector3 origin, Vector3 v)
+    {
+        HitRecord rec = new HitRecord();
+        if (IsHit(new Ray(origin, v), 0.001f, float.PositiveInfinity, ref rec) == false)
+        {
+            return 0f;
+        }
+
+        float area = (x1 - x0) * (z1 - z0);
+        float distance_squared = rec.t * rec.t * v.sqrMagnitude;
+        float cosine = Mathf.Abs(Vector3.Dot(v, rec.normal) / v.magnitude);
+
+        return distance_squared / (cosine * area);
+    }
+
+    public override Vector3 RandomPDF(Vector3 origin)
+    {
+        var random_point = new Vector3(UnityEngine.Random.Range(x0, x1), k, UnityEngine.Random.Range(z0, z1));
+        return random_point - origin;
+    }
+
 }
 
 
