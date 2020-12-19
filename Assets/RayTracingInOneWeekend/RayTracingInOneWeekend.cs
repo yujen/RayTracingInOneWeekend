@@ -428,7 +428,11 @@ public class RayTracingInOneWeekend : MonoBehaviour
                 backgroundColor = Color.black;
                 cam.lookFrom = new Vector3(278f, 278f, -800f);
                 cam.lookAt = new Vector3(278f, 278f, 0f);
+                cam.vup = Vector3.up;
                 cam.verticalFov = 40f;
+                cam.focusDistance = 10f;
+                cam.aperture = 0f;
+                cam.shutterTime = new Vector2(0f, 1f);
                 //textureWidthHeight = new Vector2Int(600, 600);
                 cam.Setup(textureWidthHeight);
 
@@ -452,8 +456,8 @@ public class RayTracingInOneWeekend : MonoBehaviour
         // image
         int textureWidth = textureWidthHeight.x;
         int textureHeight = textureWidthHeight.y;
-        //textureResult = new Texture2D(textureWidth, textureHeight, TextureFormat.RGBA32, true, true);
-        textureResult = new Texture2D(textureWidth, textureHeight, TextureFormat.RGBA32, true, false);
+        textureResult = new Texture2D(textureWidth, textureHeight, TextureFormat.RGBA32, true, true);
+        //textureResult = new Texture2D(textureWidth, textureHeight, TextureFormat.RGBA32, true, false);
 
         //
         Debug.Log($"Setup scene time: {Time.realtimeSinceStartup - startTime} sec");
@@ -472,7 +476,6 @@ public class RayTracingInOneWeekend : MonoBehaviour
                     float v = ((float)y + Utils.RandomNum) / (textureHeight - 1);
 
                     var ray = cam.GetRay(u, v);
-                    //pixelColor += RayColor(ray, listSceneObj, maxDepth);
                     pixelColor += RayColor(ray, backgroundColor, listSceneObj, maxDepth);
                 }
                 WriteColor(textureResult, x, y, pixelColor, samplesPerPixel);
