@@ -54,7 +54,7 @@ public class RayTracingInOneWeekend : MonoBehaviour
 
         // If the ray hits nothing, return the background color.
         HitRecord rec = null;
-        if (world.IsHit(ray, 0.0001f, float.PositiveInfinity, ref rec) == false)
+        if (world.IsHit(ray, 0.001f, float.PositiveInfinity, ref rec) == false)
         {
             return background;
         }
@@ -81,13 +81,7 @@ public class RayTracingInOneWeekend : MonoBehaviour
 
 
 
-    /// <summary>
-    /// Returns a random real in [0,1).
-    /// </summary>
-    float GetRandomNum()
-    {
-        return Random.Range(0f, 0.99999f);
-    }
+   
 
 
     void WriteColor(Texture2D tex, int x, int y, Color pixelColor, int samplesPerPixel)
@@ -470,8 +464,8 @@ public class RayTracingInOneWeekend : MonoBehaviour
 
                 for (int i = 0; i < samplesPerPixel; i++)
                 {
-                    float u = ((float)x + GetRandomNum()) / (textureWidth - 1);
-                    float v = ((float)y + GetRandomNum()) / (textureHeight - 1);
+                    float u = ((float)x + Utils.RandomNum()) / (textureWidth - 1);
+                    float v = ((float)y + Utils.RandomNum()) / (textureHeight - 1);
 
                     var ray = cam.GetRay(u, v);
                     //pixelColor += RayColor(ray, listSceneObj, maxDepth);

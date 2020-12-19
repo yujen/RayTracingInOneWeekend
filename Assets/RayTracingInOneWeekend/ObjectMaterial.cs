@@ -24,7 +24,9 @@ abstract public class ObjectMaterial
 
     abstract public bool Scatter(Ray inRay, HitRecord hitRecord, out Color attenuation, out Ray scatteredRay, out float pdf);
 
-
+    /// <summary>
+    /// Probability Density Function for importance sampling
+    /// </summary>
     abstract public float ScatteringPDF(Ray inRay, HitRecord hitRecord, Ray scatteredRay);
 
 
