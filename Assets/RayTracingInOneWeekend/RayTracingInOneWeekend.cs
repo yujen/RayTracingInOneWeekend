@@ -63,7 +63,7 @@ public class RayTracingInOneWeekend : MonoBehaviour
         Color albedo;
         Ray scattered;
         float pdf;  // probability density function
-        Color emitted = rec.objMaterial.Emitted(rec.uv, rec.p);
+        Color emitted = rec.objMaterial.Emitted(rec);
 
         if (rec.objMaterial.Scatter(ray, rec, out albedo, out scattered, out pdf) == false)
         {
@@ -80,7 +80,7 @@ public class RayTracingInOneWeekend : MonoBehaviour
         {
             return emitted;
         }
-            
+
 
         float light_area = (343 - 213) * (332 - 227);
         float light_cosine = Mathf.Abs(to_light.y);
@@ -93,7 +93,7 @@ public class RayTracingInOneWeekend : MonoBehaviour
         scattered = new Ray(rec.p, to_light, ray.time);
 
         // =======================
-        
+
 
         //
         return emitted
@@ -107,7 +107,7 @@ public class RayTracingInOneWeekend : MonoBehaviour
 
 
 
-   
+
 
 
     void WriteColor(Texture2D tex, int x, int y, Color pixelColor, int samplesPerPixel)
@@ -258,7 +258,7 @@ public class RayTracingInOneWeekend : MonoBehaviour
         // 
         listObj.Add(new RectangleYZ(0f, 555f, 0f, 555f, 555f, matGreen));
         listObj.Add(new RectangleYZ(0f, 555f, 0f, 555f, 0f, matRed));
-        listObj.Add(new RectangleXZ(213f, 343f, 227f, 332f, 554f, matLight));
+        listObj.Add(new FlipFace(new RectangleXZ(213f, 343f, 227f, 332f, 554f, matLight)));
         listObj.Add(new RectangleXZ(0f, 555f, 0f, 555f, 0f, matWhite));
         listObj.Add(new RectangleXZ(0f, 555f, 0f, 555f, 555f, matWhite));
         listObj.Add(new RectangleXY(0f, 555f, 0f, 555f, 555f, matWhite));
@@ -482,8 +482,7 @@ public class RayTracingInOneWeekend : MonoBehaviour
         // image
         int textureWidth = textureWidthHeight.x;
         int textureHeight = textureWidthHeight.y;
-        textureResult = new Texture2D(textureWidth, textureHeight, TextureFormat.ARGB32, false, true);
-        //textureResult = new Texture2D(textureWidth, textureHeight, TextureFormat.RGBA32, false, false);
+        textureResult = new Texture2D(textureWidth, textureHeight, TextureFormat.ARGB32, true, true);
 
         //
         Debug.Log($"Setup scene time: {Time.realtimeSinceStartup - startTime} sec");
@@ -523,7 +522,7 @@ public class RayTracingInOneWeekend : MonoBehaviour
         texture.Apply();
 
         var rt = RenderTexture.GetTemporary(texture.width, texture.height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Default);
-        
+
         Graphics.Blit(texture, rt);
 
         RenderTexture.active = rt;

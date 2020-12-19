@@ -363,3 +363,33 @@ public class RotateY : Hittable
 
 }
 
+public class FlipFace : Hittable
+{
+    protected Hittable hittable;
+
+
+    public FlipFace(Hittable hittable)
+    {
+        this.hittable = hittable;
+    }
+
+
+    public override bool BoundingBox(float time0, float time1, out AABB output)
+    {
+        return hittable.BoundingBox(time0, time1, out output);
+    }
+
+    public override bool IsHit(Ray ray, float t_min, float t_max, ref HitRecord hitRecord)
+    {
+        if (hittable.IsHit(ray, t_min, t_max, ref hitRecord) == false)
+        {
+            return false;
+        }
+
+        hitRecord.frontFace = !hitRecord.frontFace;
+
+        return true;
+
+    }
+}
+

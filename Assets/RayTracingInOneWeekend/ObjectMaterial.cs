@@ -30,7 +30,7 @@ abstract public class ObjectMaterial
     abstract public float ScatteringPDF(Ray inRay, HitRecord hitRecord, Ray scatteredRay);
 
 
-    virtual public Color Emitted(Vector2 uv, Vector3 p)
+    virtual public Color Emitted(HitRecord hitRecord)
     {
         return Color.black;
     }
@@ -209,15 +209,22 @@ public class DiffuseLight : ObjectMaterial
         return false;
     }
 
-    public override Color Emitted(Vector2 uv, Vector3 p)
-    {
-        return emit.Value(uv, p);
-    }
-
     public override float ScatteringPDF(Ray inRay, HitRecord hitRecord, Ray scatteredRay)
     {
         throw new System.NotImplementedException();
     }
+    public override Color Emitted(HitRecord hitRecord)
+    {
+        if (hitRecord.frontFace)
+        {
+            return emit.Value(hitRecord.uv, hitRecord.p);
+        }
+        else
+        {
+            return Color.black;
+        }
+    }
+
 }
 
 
