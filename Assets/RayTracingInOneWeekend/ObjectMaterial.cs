@@ -65,7 +65,7 @@ public class LambertainMaterial : ObjectMaterial
     public override bool Scatter(Ray inRay, HitRecord hitRecord, out ScatterRecord scatterRec)
     {
         scatterRec = new ScatterRecord();
-        //scatterRec.ray = null;
+        scatterRec.specluarRay = null;
         scatterRec.isSpecular = false;
         scatterRec.attenuation = albedo.Value(hitRecord.uv, hitRecord.p);
         scatterRec.pdf = new CosinePDF(hitRecord.normal);
@@ -131,7 +131,7 @@ public class FuzzyMetalMaterial : MetalMaterial
         var reflected = Reflect(inRay.direction.normalized, hitRecord.normal);
 
         scatterRec = new ScatterRecord();
-        scatterRec.specluarRay = new Ray(hitRecord.p, reflected + Random.insideUnitSphere * fuzz, inRay.time);
+        scatterRec.specluarRay = new Ray(hitRecord.p, reflected + Random.insideUnitSphere * fuzz, 0f);
         scatterRec.isSpecular = true;
         scatterRec.attenuation = albedo;
         scatterRec.pdf = null;

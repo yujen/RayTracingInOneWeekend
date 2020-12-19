@@ -390,7 +390,7 @@ public class RayTracingInOneWeekend : MonoBehaviour
 
         // scene
         HittableList listSceneObj;
-        HittableList listLight = new HittableList();
+        Hittable listLight = null;
         switch (scene)
         {
             case Scene.RandomSphereScene:
@@ -436,8 +436,8 @@ public class RayTracingInOneWeekend : MonoBehaviour
 
                 listSceneObj = CornellBoxScene();
 
-                listLight.Add(new RectangleXZ(213f, 343f, 227f, 332f, 554f, null));
-                listLight.Add(new Sphere(new Vector3(190f, 90f, 190f), 90f, null));
+                listLight = (new RectangleXZ(213f, 343f, 227f, 332f, 554f, null));
+                //listLight.Add(new Sphere(new Vector3(190f, 90f, 190f), 90f, null));
                 break;
 
             case Scene.CornellSmokeBoxScene:
