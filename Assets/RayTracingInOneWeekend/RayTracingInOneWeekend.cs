@@ -70,10 +70,12 @@ public class RayTracingInOneWeekend : MonoBehaviour
             return emitted;
         }
 
+        var p0 = new HittablePDF(lights, rec.p);
+        var p1 = new CosinePDF(rec.normal);
+        var mixturePDF = new MixturePDF(p0, p1);
 
-        var lightsPDF = new HittablePDF(lights, rec.p);
-        scattered = new Ray(rec.p, lightsPDF.Generate(), ray.time);
-        pdf = lightsPDF.Value(scattered.direction);
+        scattered = new Ray(rec.p, mixturePDF.Generate(), ray.time);
+        pdf = mixturePDF.Value(scattered.direction);
 
         /*
         // =======================

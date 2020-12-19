@@ -70,3 +70,34 @@ public class HittablePDF : PDF
     }
 }
 
+
+public class MixturePDF : PDF
+{
+    private PDF[] listPDF = new PDF[2];
+
+
+    public MixturePDF(PDF p0, PDF p1)
+    {
+        listPDF[0] = p0;
+        listPDF[1] = p1;
+    }
+
+    public override Vector3 Generate()
+    {
+        if (Random.value < 0.5f)
+        {
+            return listPDF[0].Generate();
+        }
+        else
+        {
+            return listPDF[1].Generate();
+        }
+    }
+
+    public override float Value(Vector3 direction)
+    {
+        return 0.5f * listPDF[0].Value(direction) + 0.5f * listPDF[1].Value(direction);
+    }
+
+}
+
