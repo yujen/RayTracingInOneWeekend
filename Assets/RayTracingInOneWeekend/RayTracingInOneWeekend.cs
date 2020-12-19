@@ -95,6 +95,13 @@ public class RayTracingInOneWeekend : MonoBehaviour
 
     void WriteColor(Texture2D tex, int x, int y, Color pixelColor, int samplesPerPixel)
     {
+        // Replace NaN components with zero. See explanation in Ray Tracing: The Rest of Your Life.
+        float r = float.IsNaN(pixelColor.r) ? 0f : pixelColor.r;
+        float g = float.IsNaN(pixelColor.g) ? 0f : pixelColor.g;
+        float b = float.IsNaN(pixelColor.b) ? 0f : pixelColor.b;
+
+        pixelColor = new Color(r, g, b);
+
         // Divide the color by the number of samples.
         float scale = 1f / (float)samplesPerPixel;
         pixelColor *= scale;
