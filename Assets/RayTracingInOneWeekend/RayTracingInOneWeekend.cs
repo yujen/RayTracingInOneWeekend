@@ -70,6 +70,13 @@ public class RayTracingInOneWeekend : MonoBehaviour
             return emitted;
         }
 
+
+        var cosinePDF = new CosinePDF(rec.normal);
+        scattered = new Ray(rec.p, cosinePDF.Generate(), ray.time);
+        pdf = cosinePDF.Value(scattered.direction);
+
+
+        /*
         // =======================
         var on_light = new Vector3(Utils.RandomRange(213, 343), 554, Utils.RandomRange(227, 332));
         var to_light = on_light - rec.p;
@@ -91,9 +98,8 @@ public class RayTracingInOneWeekend : MonoBehaviour
 
         pdf = distance_squared / (light_cosine * light_area);
         scattered = new Ray(rec.p, to_light, ray.time);
-
         // =======================
-
+        */
 
         //
         return emitted
@@ -493,7 +499,7 @@ public class RayTracingInOneWeekend : MonoBehaviour
         {
             for (int x = 0; x < textureWidth; x++)
             {
-                Color pixelColor = Color.black;
+                Color pixelColor = new Color(0f, 0f, 0f, 0f);
 
                 for (int i = 0; i < samplesPerPixel; i++)
                 {

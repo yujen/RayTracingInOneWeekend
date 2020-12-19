@@ -53,7 +53,7 @@ public class LambertainMaterial : ObjectMaterial
     public LambertainMaterial(Color albedo) : this(new SolidColor(albedo)) { }
 
 
-    override public bool Scatter(Ray inRay, HitRecord hitRecord, out Color attenuation, out Ray scatteredRay, out float pdf)
+    public override bool Scatter(Ray inRay, HitRecord hitRecord, out Color attenuation, out Ray scatteredRay, out float pdf)
     {
         var uvw = new ONB();
         uvw.BuildFromW(hitRecord.normal);

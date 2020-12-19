@@ -31,7 +31,7 @@ public class HitRecord
 }
 
 
-public abstract class Hittable
+abstract public class Hittable
 {
     abstract public bool IsHit(Ray ray, float t_min, float t_max, ref HitRecord hitRecord);
 
