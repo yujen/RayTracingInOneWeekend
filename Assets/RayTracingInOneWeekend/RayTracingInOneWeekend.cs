@@ -69,8 +69,13 @@ public class RayTracingInOneWeekend : MonoBehaviour
         }
         if (scatterRec.isSpecular)
         {
-            return scatterRec.attenuation
-                * RayColor(scatterRec.specluarRay, background, world, lights, depth - 1);
+            return scatterRec.attenuation * RayColor(scatterRec.specluarRay, background, world, lights, depth - 1);
+        }
+
+        // fix: book1 and book2
+        if (lights == null)
+        {
+            return scatterRec.attenuation * RayColor(scatterRec.specluarRay, background, world, lights, depth - 1);
         }
 
         //
@@ -481,7 +486,7 @@ public class RayTracingInOneWeekend : MonoBehaviour
         // image
         int textureWidth = textureWidthHeight.x;
         int textureHeight = textureWidthHeight.y;
-        textureResult = new Texture2D(textureWidth, textureHeight, TextureFormat.ARGB32, true, true);
+        textureResult = new Texture2D(textureWidth, textureHeight, TextureFormat.ARGB32, false, true);
 
         //
         Debug.Log($"Setup scene time: {Time.realtimeSinceStartup - startTime} sec");
@@ -520,12 +525,12 @@ public class RayTracingInOneWeekend : MonoBehaviour
     {
         texture.Apply();
 
-        var rt = RenderTexture.GetTemporary(texture.width, texture.height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Default);
+        var rt = RenderTexture.GetTemporary(texture.width, texture.height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
 
         Graphics.Blit(texture, rt);
 
         RenderTexture.active = rt;
-        Texture2D tex = new Texture2D(rt.width, rt.height, TextureFormat.ARGB32, true, true);
+        Texture2D tex = new Texture2D(rt.width, rt.height, TextureFormat.ARGB32, false, true);
         tex.ReadPixels(new Rect(0, 0, rt.width, rt.height), 0, 0);
         tex.Apply();
 
