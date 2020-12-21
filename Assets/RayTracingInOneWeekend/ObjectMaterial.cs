@@ -64,7 +64,8 @@ public class LambertainMaterial : ObjectMaterial
 
     public override bool Scatter(Ray inRay, HitRecord hitRecord, out ScatterRecord scatterRec)
     {
-        var direction = Utils.RandomInHemisphere(hitRecord.normal);
+        var direction = hitRecord.normal + Random.insideUnitSphere;
+        direction = (direction.IsNearZero()) ? hitRecord.normal : direction;    // Catch degenerate scatter direction
 
         scatterRec = new ScatterRecord();
         scatterRec.specluarRay = new Ray(hitRecord.p, direction, inRay.time);

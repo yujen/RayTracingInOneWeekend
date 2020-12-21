@@ -45,6 +45,7 @@ public class Sphere : Hittable
             }
         }
 
+
         hitRecord.t = root;
         hitRecord.p = ray.At(hitRecord.t);
         Vector3 outwardNormal = (hitRecord.p - center) / radius;

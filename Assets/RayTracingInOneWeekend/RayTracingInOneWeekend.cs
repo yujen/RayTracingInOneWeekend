@@ -425,8 +425,8 @@ public class RayTracingInOneWeekend : MonoBehaviour
             case Scene.SimpleLightScene:
                 Debug.Log("SimpleLightScene uses fixed settings");
                 backgroundColor = Color.black;
-                cam.lookFrom = new Vector3();
-                cam.lookAt = new Vector3();
+                cam.lookFrom = new Vector3(26f, 3f, 6f);
+                cam.lookAt = new Vector3(0f, 2f, 0f);
                 cam.verticalFov = 20f;
                 cam.Setup(textureWidthHeight);
 
