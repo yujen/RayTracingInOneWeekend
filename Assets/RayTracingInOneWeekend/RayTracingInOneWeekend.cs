@@ -338,7 +338,7 @@ public class RayTracingInOneWeekend : MonoBehaviour
 
         // light
         var matLight = new DiffuseLight(new Color(7f, 7f, 7f));
-        listObj.Add(new RectangleXZ(123f, 423f, 147f, 412f, 554f, matLight));
+        listObj.Add(new FlipFace(new RectangleXZ(123f, 423f, 147f, 412f, 554f, matLight)));
 
         // moving sphere
         var center1 = new Vector3(400f, 400f, 200f);
@@ -475,7 +475,7 @@ public class RayTracingInOneWeekend : MonoBehaviour
                 cam.lookFrom = new Vector3(478f, 278f, -600f);
                 cam.lookAt = new Vector3(278f, 278f, 0f);
                 cam.verticalFov = 40f;
-                textureWidthHeight = new Vector2Int(800, 800);
+                //textureWidthHeight = new Vector2Int(800, 800);
                 cam.Setup(textureWidthHeight);
 
                 listSceneObj = FinalScene();
