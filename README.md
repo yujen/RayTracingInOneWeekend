@@ -1,6 +1,6 @@
 # RayTracingInOneWeekend
 
-[Ray Tracing in One Weekend](https://github.com/RayTracing) Unity implementation
+[Ray Tracing in One Weekend](https://github.com/RayTracing) implemented in Unity
 
 ## Book 1: Random Sphere Scene
 ![Alt text](/output_images/final_1.jpg "final_1.jpg")
