@@ -104,13 +104,17 @@ public class RayTracingInOneWeekend : MonoBehaviour
         float r = float.IsNaN(pixelColor.r) ? 0f : pixelColor.r;
         float g = float.IsNaN(pixelColor.g) ? 0f : pixelColor.g;
         float b = float.IsNaN(pixelColor.b) ? 0f : pixelColor.b;
-
-        pixelColor = new Color(r, g, b);
+        r = float.IsInfinity(r) ? 0f : r;
+        g = float.IsInfinity(g) ? 0f : g;
+        b = float.IsInfinity(b) ? 0f : b;
 
         // Divide the color by the number of samples.
         float scale = 1f / (float)samplesPerPixel;
-        pixelColor *= scale;
-        pixelColor = new Color(pixelColor.r, pixelColor.g, pixelColor.b, 1f);
+        r *= scale;
+        g *= scale;
+        b *= scale;
+
+        pixelColor = new Color(r, g, b, 1f);
 
         /*
         // gamma-correct for gamma=2.0
