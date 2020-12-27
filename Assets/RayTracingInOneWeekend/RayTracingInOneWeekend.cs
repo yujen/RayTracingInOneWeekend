@@ -529,7 +529,7 @@ public class RayTracingInOneWeekend : MonoBehaviour
     {
         texture.Apply();
 
-        var rt = RenderTexture.GetTemporary(texture.width, texture.height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.Linear);
+        var rt = RenderTexture.GetTemporary(texture.width, texture.height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.sRGB);
 
         Graphics.Blit(texture, rt);
 
