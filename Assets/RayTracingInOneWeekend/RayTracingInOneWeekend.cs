@@ -372,7 +372,7 @@ public class RayTracingInOneWeekend : MonoBehaviour
         listObj.Add(new Sphere(new Vector3(400, 200, 400), 100, matEarth));
 
         // noise sphere
-        var matNoise = new LambertainMaterial(new NoiseTexture(0.1f));
+        var matNoise = new LambertainMaterial(new MarbleTexture(4f));
         listObj.Add(new Sphere(new Vector3(220, 280, 300), 80, matNoise));
 
         // box sphere

@@ -211,7 +211,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
 --- !u!1 &1651417732
 GameObject:
@@ -297,7 +297,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1651417736
 MonoBehaviour:
@@ -311,11 +311,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 234fec3ea45640242b041f24b34804b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scene: 5
+  scene: 7
   backgroundColor: {r: 0.7, g: 0.8, b: 1, a: 1}
   textureWidthHeight: {x: 400, y: 400}
-  samplesPerPixel: 1000
-  maxDepth: 50
+  samplesPerPixel: 8
+  maxDepth: 8
   textureResult: {fileID: 0}
 --- !u!114 &1651417737
 MonoBehaviour:
