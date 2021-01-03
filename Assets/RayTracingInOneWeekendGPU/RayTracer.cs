@@ -219,15 +219,16 @@ namespace RayTracingInOneWeekendGPU
                 m_sampleCount = 0;
 
                 RayTraceKernels.Dispatch(m_normalizeSamplesKernel,
-                                         m_accumulatedImage.width / 8,
-                                         m_accumulatedImage.height / 8,
-                                         m_superSamplingFactor);
+                                         m_accumulatedImage.width / 8,  // 1024/8 = 128
+                                         m_accumulatedImage.height / 8, // 512/8 = 64
+                                         m_superSamplingFactor);        // 8
             }
 
             m_sampleCount++;
             RayTraceKernels.Dispatch(m_initCameraRaysKernel,
                                       m_accumulatedImage.width / 8,
-                                      m_accumulatedImage.height / 8, m_superSamplingFactor);
+                                      m_accumulatedImage.height / 8,
+                                      m_superSamplingFactor);
 
 
             float t = Time.time;
@@ -239,25 +240,6 @@ namespace RayTracingInOneWeekendGPU
                                      m_accumulatedImage.width / 8,
                                      m_accumulatedImage.height / 8,
                                      m_superSamplingFactor * m_bouncesPerPixel);
-        }
-
-        void OnRenderImage(RenderTexture source, RenderTexture dest)
-        {
-            // Resolve the final color directly from the ray accumColor.
-            FullScreenResolve.SetBuffer("_Rays", m_raysBuffer);
-
-            // Blit the rays into the accumulated image.
-            // This isn't necessary, though it implicitly applies a box filter to the accumulated color,
-            // which reduces aliasing artifacts when the viewport size doesn't match the underlying texture
-            // size (should only be a problem in-editor).
-            FullScreenResolve.SetVector("_AccumulatedImageSize",
-                                        new Vector2(m_accumulatedImage.width, m_accumulatedImage.height));
-            Graphics.Blit(dest, m_accumulatedImage, FullScreenResolve);
-
-            // Simple copy from accumulated image to viewport, the filter is applied here.
-            // This extra copy and the associated texture could be skipped by filtering the ray colors
-            // directly in the full screen resolve shader.
-            Graphics.Blit(m_accumulatedImage, dest);
         }
 
         private void Update()
@@ -280,21 +262,18 @@ namespace RayTracingInOneWeekendGPU
                 RenderTexture.ReleaseTemporary(m_accumulatedImage);
                 m_accumulatedImage = null;
             }
-            if (m_spheresBuffer != null)
-            {
-                m_spheresBuffer.Dispose();
-                m_spheresBuffer = null;
-            }
-            if (m_raysBuffer != null)
-            {
-                m_raysBuffer.Dispose();
-                m_raysBuffer = null;
-            }
-            if (m_fibSamples != null)
-            {
-                m_fibSamples.Dispose();
-                m_fibSamples = null;
-            }
+
+            m_spheresBuffer?.Release();
+            m_spheresBuffer = null;
+
+            m_raysBuffer?.Release();
+            m_raysBuffer = null;
+
+            m_fibSamples?.Release();
+            m_fibSamples = null;
+
+            FullScreenResolve.SetBuffer("_Rays", m_raysBuffer);
+            FullScreenResolve.SetVector("_AccumulatedImageSize", Vector2.zero);
         }
 
         /// <summary>

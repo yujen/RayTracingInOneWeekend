@@ -60,10 +60,6 @@
                 uint rayCount, stride;
                 _Rays.GetDimensions(rayCount, stride);
 
-                if (rayCount == 0)
-                {
-                    return SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, input.uv);
-                }
 
                 float2 size = _AccumulatedImageSize;
                 int2 xy = input.uv * size;
