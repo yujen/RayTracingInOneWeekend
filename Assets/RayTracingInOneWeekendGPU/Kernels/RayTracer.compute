@@ -345,8 +345,6 @@ void NormalizeSamples(uint3 id : SV_DispatchThreadID)
 	// The max() avoids div/0 and min avoids HDR ghosting for very bright values.
 	//
     int rayIndex = (id.x * height + id.y) + (width * height * id.z);
-    _Rays[rayIndex].accumColor = min(1,
-		_Rays[rayIndex].accumColor
-		/ max(1, _Rays[rayIndex].accumColor.a));
+    _Rays[rayIndex].accumColor = min(1, _Rays[rayIndex].accumColor / max(1, _Rays[rayIndex].accumColor.a));
     _Rays[rayIndex].accumColor /= 8;
 }
