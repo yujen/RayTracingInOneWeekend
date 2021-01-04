@@ -40,8 +40,15 @@ float _FocusDistance;
 int _ActiveMaterial;
 
 Texture2D<float4> _AccumulatedImage;
+int _ImageWidth;
+int _ImageHeight;
+
 StructuredBuffer<Sphere> _Spheres;
+int _SphereCount;
+
 RWStructuredBuffer<Ray> _Rays;
+int _RayCount;
+
 
 // ---------------------------------------------------------------------------------------------- //
 // Scene Intersection
@@ -59,15 +66,13 @@ bool HitSpheres(Ray r, float tMin, float tMax, out HitRecord rec)
     HitRecord tempRec;
     bool hitAnything = false;
     float closestSoFar = tMax;
-    uint numStructs;
-    uint stride;
-    _Spheres.GetDimensions(numStructs, stride);
+    
 
 	//
 	// GPU NOTE: A long running for-loop is often the wrong/inefficient choice for a compute shader.
 	//           Typically it's better to reformulate the problem in terms of compute threads.
 	//
-    for (uint i = 0; i < numStructs; i++)
+    for (int i = 0; i < _SphereCount; i++)
     {
         if (_Spheres[i].Hit(r, tMin, closestSoFar, tempRec))
         {
@@ -254,20 +259,12 @@ void RayTrace(uint3 id : SV_DispatchThreadID,
 	uint3 groupThreadID : SV_GroupThreadID,
 	uint groupIndex : SV_GroupIndex)
 {
-    uint width;
-    uint height;
-    _AccumulatedImage.GetDimensions(width, height);
-
-    uint rayCount;
-    uint stride;
-    _Rays.GetDimensions(rayCount, stride);
-
     int rayIndex;
     int2 xy;
 	vec2 uv;
     Ray r;
 
-    GetNextRay(id, rayCount, width, height, /*outputs*/xy, uv, rayIndex, r);
+    GetNextRay(id, _RayCount, _ImageWidth, _ImageHeight, /*outputs*/xy, uv, rayIndex, r);
     if (length(r.direction) == 0)
     {
         return;
@@ -305,11 +302,7 @@ void InitCameraRays(uint3 id : SV_DispatchThreadID,
 	uint3 groupThreadID : SV_GroupThreadID,
 	uint groupIndex : SV_GroupIndex)
 {
-    uint width;
-    uint height;
-    _AccumulatedImage.GetDimensions(width, height);
-
-    int rayIndex = (id.x * height + id.y) + (width * height * id.z);
+    int rayIndex = (id.x * _ImageHeight + id.y) + (_ImageWidth * _ImageHeight * id.z);
 
     if (length(_Rays[rayIndex].direction) > 0)
     {
@@ -317,13 +310,13 @@ void InitCameraRays(uint3 id : SV_DispatchThreadID,
         return;
     }
 
-	vec2 uv = vec2(id.x / (width - 1.0),
-		id.y / (height - 1.0));
+	vec2 uv = vec2(id.x / (_ImageWidth - 1.0),
+		id.y / (_ImageHeight - 1.0));
 
 	// Jitter the ray by jittering the UV sample.
 
     uv += (Noise(uv * 10000 + id.z * 100 + _Time.y) - .5)
-		* vec2(1.0 / width, 1.0 / height);
+		* vec2(1.0 / _ImageWidth, 1.0 / _ImageHeight);
 
     Ray r = InitCameraRay(uv);
     r.accumColor = _Rays[rayIndex].accumColor;
@@ -337,14 +330,10 @@ void InitCameraRays(uint3 id : SV_DispatchThreadID,
 [numthreads(8, 8, 1)]
 void NormalizeSamples(uint3 id : SV_DispatchThreadID)
 {
-    uint width;
-    uint height;
-    _AccumulatedImage.GetDimensions(width, height);
-
 	//
 	// The max() avoids div/0 and min avoids HDR ghosting for very bright values.
 	//
-    int rayIndex = (id.x * height + id.y) + (width * height * id.z);
+    int rayIndex = (id.x * _ImageHeight + id.y) + (_ImageWidth * _ImageHeight * id.z);
     _Rays[rayIndex].accumColor = min(1, _Rays[rayIndex].accumColor / max(1, _Rays[rayIndex].accumColor.a));
     _Rays[rayIndex].accumColor /= 8;
 }

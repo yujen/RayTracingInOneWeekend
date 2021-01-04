@@ -155,6 +155,10 @@ namespace RayTracingInOneWeekendGPU
             RayTraceKernels.SetTexture(m_normalizeSamplesKernel, "_AccumulatedImage", m_accumulatedImage);
             RayTraceKernels.SetBuffer(m_normalizeSamplesKernel, "_HemisphereSamples", m_fibSamples);
 
+            //
+            RayTraceKernels.SetInt("_ImageWidth", m_accumulatedImage.width);
+            RayTraceKernels.SetInt("_ImageHeight", m_accumulatedImage.height);
+
             // DOF parameter defaults.
             RayTraceKernels.SetFloat("_Aperture", 2.0f);
             RayTraceKernels.SetFloat("_FocusDistance", 5.0f);
@@ -204,6 +208,10 @@ namespace RayTracingInOneWeekendGPU
                 SetMatrix(RayTraceKernels, "_Projection", Camera.main.projectionMatrix);
                 RayTraceKernels.SetFloat("_FocusDistance", FocusDistance);
                 RayTraceKernels.SetFloat("_Aperture", Aperture);
+
+                RayTraceKernels.SetInt("_SphereCount", m_spheresBuffer.count);
+                RayTraceKernels.SetInt("_RayCount", m_raysBuffer.count);
+
 
                 m_sceneChanged = false;
                 m_lastAperture = Aperture;
