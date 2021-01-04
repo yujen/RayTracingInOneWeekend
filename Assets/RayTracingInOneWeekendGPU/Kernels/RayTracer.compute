@@ -40,14 +40,13 @@ float _FocusDistance;
 int _ActiveMaterial;
 
 Texture2D<float4> _AccumulatedImage;
-int _ImageWidth;
-int _ImageHeight;
+uint _ImageWidth, _ImageHeight;
 
 StructuredBuffer<Sphere> _Spheres;
-int _SphereCount;
+uint _SphereCount;
 
 RWStructuredBuffer<Ray> _Rays;
-int _RayCount;
+uint _RayCount;
 
 
 // ---------------------------------------------------------------------------------------------- //
@@ -72,7 +71,7 @@ bool HitSpheres(Ray r, float tMin, float tMax, out HitRecord rec)
 	// GPU NOTE: A long running for-loop is often the wrong/inefficient choice for a compute shader.
 	//           Typically it's better to reformulate the problem in terms of compute threads.
 	//
-    for (int i = 0; i < _SphereCount; i++)
+    for (uint i = 0; i < _SphereCount; i++)
     {
         if (_Spheres[i].Hit(r, tMin, closestSoFar, tempRec))
         {
