@@ -231,11 +231,6 @@ namespace RayTracingInOneWeekendGPU
                                          m_accumulatedImage.height / 8, // 512/8 = 64
                                          m_superSamplingFactor);        // 8
 
-                // Blit the rays into the accumulated image.
-                // This isn't necessary, though it implicitly applies a box filter to the accumulated color,
-                // which reduces aliasing artifacts when the viewport size doesn't match the underlying texture
-                // size (should only be a problem in-editor).
-                matBlitRtCamera.SetVector("_AccumulatedImageSize", new Vector2(m_accumulatedImage.width, m_accumulatedImage.height));
             }
 
             m_sampleCount++;
@@ -256,10 +251,22 @@ namespace RayTracingInOneWeekendGPU
                                      m_superSamplingFactor * m_bouncesPerPixel);
 
 
-            // Resolve the final color directly from the ray accumColor.
-            matBlitRtCamera.SetBuffer("_Rays", m_raysBuffer);
+            
         }
 
+
+        private void Update()
+        {
+            // Resolve the final color directly from the ray accumColor.
+            matBlitRtCamera.SetBuffer("_Rays", m_raysBuffer);
+
+
+            // Blit the rays into the accumulated image.
+            // This isn't necessary, though it implicitly applies a box filter to the accumulated color,
+            // which reduces aliasing artifacts when the viewport size doesn't match the underlying texture
+            // size (should only be a problem in-editor).
+            matBlitRtCamera.SetVector("_AccumulatedImageSize", new Vector2(m_accumulatedImage.width, m_accumulatedImage.height));
+        }
 
 
         void ReclaimResources()
