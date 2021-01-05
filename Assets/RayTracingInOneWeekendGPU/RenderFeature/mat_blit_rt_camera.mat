@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: mat_bilt_rt_camera
+  m_Name: mat_blit_rt_camera
   m_Shader: {fileID: 4800000, guid: 485c73c2b9393094c97720216133fbb8, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4

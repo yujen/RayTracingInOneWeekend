@@ -1,4 +1,4 @@
-﻿Shader "RayTracingInOneWeekendGPU/BiltRtCamera"
+﻿Shader "RayTracingInOneWeekendGPU/BlitRtCamera"
 {
 	SubShader 
 	{
