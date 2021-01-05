@@ -20,9 +20,9 @@
 // Data Structures, Sampling, and Shading.
 // ---------------------------------------------------------------------------------------------- //
 
-#include "Structures.cginc"
-#include "Sampling.cginc"
-#include "Shading.cginc"
+#include "Structures.hlsl"
+#include "Sampling.hlsl"
+#include "Shading.hlsl"
 
 // ---------------------------------------------------------------------------------------------- //
 // Kernel Inputs & Outputs.

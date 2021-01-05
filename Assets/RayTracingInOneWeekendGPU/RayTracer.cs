@@ -14,7 +14,7 @@ namespace RayTracingInOneWeekendGPU
         private ComputeShader RayTraceKernels;
 
         [SerializeField]
-        private Material FullScreenResolve;
+        private Material matBlitRtCamera;
 
         [SerializeField, Range(0.001f, 100f)]
         private float FocusDistance;
@@ -164,7 +164,7 @@ namespace RayTracingInOneWeekendGPU
             RayTraceKernels.SetFloat("_FocusDistance", 5.0f);
 
             // Assign the texture to the main materail, to blit to screen.
-            FullScreenResolve.mainTexture = m_accumulatedImage;
+            matBlitRtCamera.mainTexture = m_accumulatedImage;
 
         }
 
@@ -230,6 +230,12 @@ namespace RayTracingInOneWeekendGPU
                                          m_accumulatedImage.width / 8,  // 1024/8 = 128
                                          m_accumulatedImage.height / 8, // 512/8 = 64
                                          m_superSamplingFactor);        // 8
+
+                // Blit the rays into the accumulated image.
+                // This isn't necessary, though it implicitly applies a box filter to the accumulated color,
+                // which reduces aliasing artifacts when the viewport size doesn't match the underlying texture
+                // size (should only be a problem in-editor).
+                matBlitRtCamera.SetVector("_AccumulatedImageSize", new Vector2(m_accumulatedImage.width, m_accumulatedImage.height));
             }
 
             m_sampleCount++;
@@ -248,20 +254,13 @@ namespace RayTracingInOneWeekendGPU
                                      m_accumulatedImage.width / 8,
                                      m_accumulatedImage.height / 8,
                                      m_superSamplingFactor * m_bouncesPerPixel);
-        }
 
-        private void Update()
-        {
+
             // Resolve the final color directly from the ray accumColor.
-            FullScreenResolve.SetBuffer("_Rays", m_raysBuffer);
-
-            // Blit the rays into the accumulated image.
-            // This isn't necessary, though it implicitly applies a box filter to the accumulated color,
-            // which reduces aliasing artifacts when the viewport size doesn't match the underlying texture
-            // size (should only be a problem in-editor).
-            FullScreenResolve.SetVector("_AccumulatedImageSize",
-                                        new Vector2(m_accumulatedImage.width, m_accumulatedImage.height));
+            matBlitRtCamera.SetBuffer("_Rays", m_raysBuffer);
         }
+
+
 
         void ReclaimResources()
         {
@@ -280,8 +279,8 @@ namespace RayTracingInOneWeekendGPU
             m_fibSamples?.Release();
             m_fibSamples = null;
 
-            FullScreenResolve.SetBuffer("_Rays", m_raysBuffer);
-            FullScreenResolve.SetVector("_AccumulatedImageSize", Vector2.zero);
+            matBlitRtCamera.SetBuffer("_Rays", m_raysBuffer);
+            matBlitRtCamera.SetVector("_AccumulatedImageSize", Vector2.zero);
         }
 
         /// <summary>

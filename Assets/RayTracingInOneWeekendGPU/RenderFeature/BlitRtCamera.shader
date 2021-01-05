@@ -10,7 +10,7 @@
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/SurfaceInput.hlsl"
             #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Color.hlsl"
-            #include "../Kernels/Structures.cginc"
+            #include "../Kernels/Structures.hlsl"
 
 
             #pragma target 5.0
@@ -22,6 +22,8 @@
             SAMPLER(sampler_MainTex);
 
             StructuredBuffer<Ray> _Rays;
+            uint _RayCount;
+
             float2 _AccumulatedImageSize;
 
             
@@ -57,10 +59,6 @@
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
 
 
-                uint rayCount, stride;
-                _Rays.GetDimensions(rayCount, stride);
-
-
                 float2 size = _AccumulatedImageSize;
                 int2 xy = input.uv * size;
                 float4 color = float4(0, 0, 0, 0);
@@ -70,7 +68,7 @@
                                     + xy.y
                                     + size.x * size.y * (z);
 
-                    color += _Rays[rayIndex % rayCount].accumColor;
+                    color += _Rays[rayIndex % _RayCount].accumColor;
                 }
 
                 // Note that the blur from the blog post is no longer applied, but could

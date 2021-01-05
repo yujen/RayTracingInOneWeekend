@@ -299,7 +299,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rtDefaultSettings: {fileID: 8400000, guid: fdcdb66752684d74cb109c67e5d26c03, type: 2}
   RayTraceKernels: {fileID: 7200000, guid: c2e683fd9df8b664fa611bdbbcc24e17, type: 3}
-  FullScreenResolve: {fileID: 2100000, guid: d1d7e0f39ed2bff4286f45125ffdc380, type: 2}
+  matBlitRtCamera: {fileID: 2100000, guid: d1d7e0f39ed2bff4286f45125ffdc380, type: 2}
   FocusDistance: 6
   FocusObject: {fileID: 2018648367}
   Aperture: 0.0001
