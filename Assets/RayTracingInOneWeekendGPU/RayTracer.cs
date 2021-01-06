@@ -251,7 +251,7 @@ namespace RayTracingInOneWeekendGPU
                                      m_superSamplingFactor * m_bouncesPerPixel);
 
 
-            
+
         }
 
 
@@ -382,6 +382,9 @@ namespace RayTracingInOneWeekendGPU
 
             m_sceneChanged = true;
         }
+
+
+
 
     }
 

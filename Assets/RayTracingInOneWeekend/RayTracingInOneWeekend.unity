@@ -311,7 +311,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 234fec3ea45640242b041f24b34804b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scene: 7
+  scene: 0
   backgroundColor: {r: 0.7, g: 0.8, b: 1, a: 1}
   textureWidthHeight: {x: 400, y: 400}
   samplesPerPixel: 8
