@@ -24,8 +24,14 @@ namespace RayTracingInOneWeekendGPU
                 var randomPos = new Vector3(Random.Range(-3f, 3f), Random.Range(0f, 5f), Random.Range(-3f, 3f));
                 var inst = GameObject.Instantiate(sphere, randomPos, Quaternion.identity);
 
-                inst.GetComponent<MeshRenderer>().material.color = Random.ColorHSV(0f, 1f, 0f, 1f, 0.5f, 1f);
                 listSphereInst.Add(inst);
+
+                var listRenderer = inst.GetComponentsInChildren<MeshRenderer>();
+                foreach (var renderer in listRenderer)
+                {
+                    float alpha = renderer.sharedMaterial.color.a;
+                    renderer.material.color = Random.ColorHSV(0f, 1f, 0f, 1f, 0.5f, 1f, alpha, alpha);
+                }
 
                 if (listSphereInst.Count > 20)
                 {
