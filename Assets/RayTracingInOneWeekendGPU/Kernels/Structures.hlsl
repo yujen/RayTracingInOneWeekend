@@ -56,6 +56,7 @@ struct Sphere
     float radius;
     int material;
     vec3 albedo;
+    
 
     bool Hit(Ray r, float tMin, float tMax, out HitRecord rec);
 };

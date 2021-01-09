@@ -21,6 +21,7 @@ namespace RayTracingInOneWeekendGPU
         Lambertian = 1,
         Metal = 2,
         Dielectric = 3,
+        DiffuseLight = 4,
     }
 
 
@@ -35,18 +36,22 @@ namespace RayTracingInOneWeekendGPU
         protected float colorMultiplier = 1.0f;
 
 
-        private Matrix4x4 m_lastTransform = Matrix4x4.identity;
-        private float m_lastColorMultiplier;
-        private Color m_lastColor;
+        protected MeshRenderer m_meshRenderer;
+        protected Matrix4x4 m_lastTransform = Matrix4x4.identity;
+        protected float m_lastColorMultiplier;
+        protected Color m_lastColor;
 
 
-        protected void OnEnable()
+
+        protected virtual void OnEnable()
         {
+            m_meshRenderer = GetComponent<MeshRenderer>();
+
+            Update();
             RayTracer.Instance.NotifySceneChanged();
-            m_lastTransform = transform.localToWorldMatrix;
         }
 
-        protected void OnDisable()
+        protected virtual void OnDisable()
         {
             if (RayTracer.Instance != null)
             {
@@ -54,9 +59,9 @@ namespace RayTracingInOneWeekendGPU
             }
         }
 
-        protected void Update()
+        protected virtual void Update()
         {
-            var color = GetComponent<MeshRenderer>().sharedMaterial.GetColor("_BaseColor");
+            var color = m_meshRenderer.sharedMaterial.GetColor("_BaseColor");
 
             if (m_lastTransform != transform.localToWorldMatrix
                 || m_lastColorMultiplier != colorMultiplier
@@ -68,6 +73,7 @@ namespace RayTracingInOneWeekendGPU
                 RayTracer.Instance.NotifySceneChanged();
             }
         }
+
 
 
         /// <summary>

@@ -16,6 +16,8 @@
 #define kMaterialLambertian  1
 #define kMaterialMetal       2
 #define kMaterialDielectric  3
+#define kMaterialDiffuseLight  4
+
 
 bool Refract(vec3 v, vec3 n, float niOverNt, out vec3 refracted)
 {
@@ -42,6 +44,26 @@ vec3 EnvColor(Ray r, vec2 uv)
     vec3 unitDirection = normalize(r.direction);
     float t = 0.5 * (unitDirection.y + 1.0);
     return 1.0 * ((1.0 - t) * vec3(1.0, 1.0, 1.0) + t * vec3(0.5, 0.7, 1.0));
+}
+
+bool DiffuseLight(Ray rIn, HitRecord rec, inout vec3 attenuation, inout Ray scattered)
+{
+    if (rec.material != kMaterialDiffuseLight)
+    {
+        return false;
+    }
+    /*
+    vec3 target = rec.p + rec.normal + RandomInUnitSphere(rec.uv);
+  
+    scattered.origin = rec.p + .001 * rec.normal;
+    scattered.direction = target - rec.p;
+    scattered.color = rIn.color;
+    scattered.bounces = rIn.bounces;
+    scattered.material = kMaterialDiffuseLight;
+    */
+    attenuation = rec.albedo;
+    
+    return true;
 }
 
 bool ScatterLambertian(Ray rIn, HitRecord rec, inout vec3 attenuation, inout Ray scattered)

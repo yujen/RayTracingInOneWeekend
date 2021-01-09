@@ -110,7 +110,12 @@ bool Color(inout Ray r, vec2 uv)
 		// divergence and improve utilization by shading after tracing rays, though as with traditional
 		// deferred shading, doing so will require more memory and bandwidth.
 
-        if (ScatterLambertian(r, rec, attenuation, scattered)
+        if (DiffuseLight(r, rec, attenuation, scattered))
+        {
+            r.color = attenuation;
+            return false;
+        }
+        else if (ScatterLambertian(r, rec, attenuation, scattered)
 			|| ScatterMetal(r, rec, attenuation, scattered)
 			|| ScatterDielectric(r, rec, attenuation, scattered))
         {
@@ -164,13 +169,13 @@ void GetNextRay(uint3 id, uint rayCount, uint width, uint height,
 	//
 	// Convert the ray index into 2D pixel screen coordinates.
 	//
-	xy = int2(rayIndex / height % width, rayIndex % height);
+    xy = int2(rayIndex / height % width, rayIndex % height);
     //xy = int2(rayIndex % width, rayIndex / width % height);
 	
 	//
 	// Screen space UV in [0, 1].
 	//
-	uv = vec2(xy.x / (float)width, 1 - xy.y / (float)height);
+    uv = vec2(xy.x / (float) width, 1 - xy.y / (float) height);
     //uv = vec2(xy.x / (float) width, xy.y / (float) height);
 	
 	//
